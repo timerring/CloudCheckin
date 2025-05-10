@@ -1,0 +1,33 @@
+name: Create Timestamp File
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"  # Run every 5 minutes
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  create-timestamp:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Git
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      
+      - name: Create timestamp file
+        run: |
+          timestamp=$(date +"%Y%m%d_%H%M%S")
+          mkdir -p timestamps
+          echo "Timestamp: $(date)" > "timestamps/timestamp_${timestamp}.txt"
+      
+      - name: Commit and push
+        run: |
+          git add .
+          git commit -m "Add timestamp file $(date +"%Y-%m-%d %H:%M:%S")"
+          git push 
