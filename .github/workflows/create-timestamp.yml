@@ -2,7 +2,7 @@ name: Create Timestamp File
 
 on:
   schedule:
-    - cron: "0 20 * * *"  # Run every 5 minutes
+    - cron: "0 0 * * 1"  # 每周一午夜执行
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
