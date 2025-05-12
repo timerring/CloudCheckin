@@ -1,12 +1,13 @@
-name: Create Timestamp File
+name: Run Daily Actions
 
 on:
   schedule:
-    - cron: "0 0 * * 1"  # 每周一午夜执行
+    # every day 8 a.m. (UTC time 00:00, Beijing time 08:00)
+    - cron: '0 0 * * *'
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
-  create-timestamp:
+  run-actions:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -15,19 +16,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
       - name: Setup Git
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
       
-      - name: Create timestamp file
+      - name: Run V2EX checkin script
+        env:
+          V2EX_COOKIES: ${{ secrets.V2EX_COOKIES }}
         run: |
-          timestamp=$(date +"%Y%m%d_%H%M%S")
-          mkdir -p timestamps
-          echo "Timestamp: $(date)" > "timestamps/timestamp_${timestamp}.txt"
+          python v2ex/v2ex.py
       
       - name: Commit and push
         run: |
           git add .
-          git commit -m "Add timestamp file $(date +"%Y-%m-%d %H:%M:%S")"
+          git commit -m "Successfully run $(date +"%Y-%m-%d %H:%M:%S")"
           git push 
