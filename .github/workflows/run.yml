@@ -26,11 +26,18 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
       
-      - name: Run V2EX checkin script
+      # - name: Run V2EX checkin script
+      #   env:
+      #     V2EX_COOKIES: ${{ secrets.V2EX_COOKIES }}
+      #   run: |
+      #     python v2ex/v2ex.py
+
+      - name: Run Telegram notification
         env:
-          V2EX_COOKIES: ${{ secrets.V2EX_COOKIES }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python v2ex/v2ex.py
+          python telegram/notify.py
       
       - name: Commit and push
         run: |
