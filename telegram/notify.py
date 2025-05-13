@@ -2,6 +2,7 @@ import http.client
 import urllib.parse
 import json
 import os
+import sys
 
 # follow the instructions from https://core.telegram.org/bots/features#botfather and get the bot token
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
@@ -47,9 +48,11 @@ def send_tg_notification(message):
             print("Notification sent successfully", flush=True)
         else:
             print(f"Notification sent failed: {response.status} - {data}", flush=True)
+            raise Exception(f"Notification sent failed: {response.status} - {data}")
             
     except Exception as e:
         print(f"Notification sending process error: {str(e)}", flush=True)
+        sys.exit(1)
     finally:
         # ensure connection is closed
         conn.close()
