@@ -2,8 +2,8 @@ name: Run Daily Actions
 
 on:
   schedule:
-    # every day 8 a.m. (UTC time 00:00, Beijing time 08:00)
-    - cron: '0 0 * * *'
+    # every day 1 a.m. (UTC time 01:00, Beijing time 09:00)
+    - cron: '0 9 * * *'
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
@@ -21,10 +21,15 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Setup Git
+      - name: Install dependencies
         run: |
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python -m pip install --upgrade pip
+          pip install curl_cffi
+
+      # - name: Setup Git
+      #   run: |
+      #     git config --local user.name "github-actions[bot]"
+      #     git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
       
       # - name: Run V2EX checkin script
       #   env:
@@ -32,12 +37,13 @@ jobs:
       #   run: |
       #     python v2ex/v2ex.py
 
-      - name: Run Telegram notification
+      - name: Run Nodeseek checkin script
         env:
+          NODESEEK_COOKIE: ${{ secrets.NODESEEK_COOKIE }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python telegram/notify.py
+          python -m nodeseek.nodeseek
       
       # - name: Commit and push
       #   run: |
