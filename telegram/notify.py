@@ -18,7 +18,7 @@ def send_tg_notification(message):
     """
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
         print("Telegram configuration is incomplete, cannot send notification", flush=True)
-        return
+        sys.exit(1)
     
     # build the request parameters
     params = urllib.parse.urlencode({
