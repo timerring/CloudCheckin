@@ -2,8 +2,7 @@ name: Run Daily Actions
 
 on:
   schedule:
-    # every day 1 a.m. (UTC time 01:00, Beijing time 09:00)
-    - cron: '0 9 * * *'
+    - cron: '0 9 * * *' # every day 1 a.m. (UTC time 01:00, Beijing time 09:00)
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
@@ -32,6 +31,7 @@ jobs:
       #     git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Run V2EX checkin script
+        continue-on-error: true
         env:
           V2EX_COOKIE: ${{ secrets.V2EX_COOKIE }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -40,6 +40,7 @@ jobs:
           python -m v2ex.v2ex
 
       - name: Run Nodeseek checkin script
+        continue-on-error: true
         env:
           NODESEEK_COOKIE: ${{ secrets.NODESEEK_COOKIE }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
