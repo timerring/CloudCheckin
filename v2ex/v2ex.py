@@ -1,78 +1,116 @@
-import os
+from curl_cffi import requests
 import re
-import http.client
-import urllib.parse
-from datetime import datetime
-import ssl
+import os
+from datetime import datetime, timedelta
+import sys
+from telegram.notify import send_tg_notification
 
-# cookies
-COOKIES = os.getenv("V2EX_COOKIES")
-
-# 创建 SSL 上下文
-SSL_CONTEXT = ssl.create_default_context()
-
-HEADERS = {
-    "Accept": "*/*",
-    "Accept-Language": "en,zh-CN;q=0.9,zh;q=0.8,ja;q=0.7,zh-TW;q=0.6",
-    "Cookie": COOKIES,
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+cookie = os.getenv('V2EX_COOKIE')
+# Initial the message time
+time = datetime.now() + timedelta(hours=8)
+message = time.strftime("%Y/%m/%d %H:%M:%S") + " from V2EX \n"
+headers = {
+    "Referer": "https://www.v2ex.com/mission/daily",
+    "Host": "www.v2ex.com",
+    "user-agent": "Mozilla/5.0 (Linux; Android 10; Redmi K30) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
+    "cookie": f"'{cookie}'"
 }
 
-def make_request(method, url, headers=None):
-    """发送 HTTP 请求并返回响应内容"""
-    parsed_url = urllib.parse.urlparse(url)
+def get_once() -> tuple[str, bool]:
+    """get the once number and whether signed
     
-    if parsed_url.scheme == 'https':
-        conn = http.client.HTTPSConnection(parsed_url.netloc, context=SSL_CONTEXT)
-    else:
-        conn = http.client.HTTPConnection(parsed_url.netloc)
-    
-    path = parsed_url.path
-    if parsed_url.query:
-        path += '?' + parsed_url.query
-    
-    conn.request(method, path, headers=headers)
-    response = conn.getresponse()
-    data = response.read().decode('utf-8')
-    conn.close()
-    
-    return data
-
-def get_once():
+    Returns:
+        tuple: the once number and whether signed
+    """
+    global message
     url = "https://www.v2ex.com/mission/daily"
-    response_text = make_request("GET", url, HEADERS)
+    res = requests.get(url, headers=headers)
+    content = res.text
+    
+    reg1 = r"需要先登录"
+    if re.search(reg1, content):
+        message += "The cookie is overdated."
+        return None, False
+    else:
+        reg = r"每日登录奖励已领取"
+        if re.search(reg, content):
+            message += "You have already signed today.\n"
+            return None, True
+        else:
+            reg = r"redeem\?once=(.*?)'"
+            once_match = re.search(reg, content)
+            if once_match:
+                once = once_match.group(1)
+                message += f"Successfully get once {once}\n"
+                return once, False
+            else:
+                message += "Have not signed, but fail to get once\n"
+                return None, False
 
-    if "你要查看的页面需要先登录" in response_text:
-        raise Exception("登录失败，Cookie 可能已经失效")
-    elif "每日登录奖励已领取" in response_text:
-        return "", True
-
-    match = re.search(r"once=(\d+)", response_text)
-    if match:
-        return match.group(1), True
-    return "", False
-
-def check_in(once):
+def check_in(once: str) -> bool:
+    """check in and return whether success
+    
+    Args:
+        once: the once number
+        
+    Returns:
+        bool: whether success
+    """
+    global message
     url = f"https://www.v2ex.com/mission/daily/redeem?once={once}"
-    make_request("GET", url, HEADERS)
+    res = requests.get(url, headers=headers)
+    content = res.text
+    
+    reg = r"已成功领取每日登录奖励"
+    if re.search(reg, content):
+        message += "Check in successfully\n"
+        return True
+    else:
+        message += "Fail to check in\n"
+        return False
 
-def main():
+# query the balance
+def balance() -> tuple[str, str]:
+    """query the balance and return the time and balance
+    
+    Returns:
+        tuple: the time and balance
+    """
+    url = "https://www.v2ex.com/balance"
+    res = requests.get(url, headers=headers)
+    content = res.text
+    # print(content)
+    pattern = r'每日登录奖励.*?<small class="gray">(.*?)</small>.*?<td class="d" style="text-align: right;">.*?</td>.*?<td class="d" style="text-align: right;">(.*?)</td>'
+    match = re.search(pattern, content, re.DOTALL)
+    
+    if match:
+        time = match.group(1).strip()
+        balance = match.group(2).strip()
+        return time, balance
+    else:
+        return None, None
+        
+
+if __name__ == "__main__":
     try:
-        once, success = get_once()
-        if once:
-            check_in(once)
-        if success:
-            # 确保 logs 目录存在
-            os.makedirs('logs', exist_ok=True)
-            # 记录成功日志
-            with open('logs/v2ex.log', 'a') as f:
-                f.write(f"{datetime.now().strftime('%Y-%m-%d')} v2ex 签到成功\n")
-            print("V2EX 签到成功")
-            return
-        print("V2EX 签到已完成")
-    except Exception as e:
-        print(f"V2EX 签到失败: {str(e)}")
-        raise
+        if not cookie:
+            raise ValueError("Environment variable V2EX_COOKIE is not set")
+        
+        # get the once number and whether signed
+        once, signed = get_once()
 
-if __name__ == '__main__':
-    main()
+        # check in
+        if once and not signed:
+            success = check_in(once)
+            if not success:
+                raise ValueError("Fail to check in")
+            time, balance = balance()
+            if not time or not balance:
+                raise ValueError("Fail to get balance")
+        else:
+            message += "FAIL.\n"
+            send_tg_notification(message)
+            raise ValueError("Fail to check in")
+    except Exception as err:
+        print(err, flush=True)
+        sys.exit(1)

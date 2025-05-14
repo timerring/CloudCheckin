@@ -7,6 +7,7 @@ This repository contains a GitHub Action that automatically executes a set of ac
 Automatically perform daily check-ins on my frequently-used platforms.
 
 - Nodeseek
+- V2EX
 
 ## How to use
 
@@ -34,3 +35,4 @@ You can also manually trigger the workflow through the Actions tab in the GitHub
 ## References
 
 - [nodeseek](https://github.com/xinycai/nodeseek_signin)
+- [V2EX](https://github.com/CruiseTian/action-hub)

@@ -30,12 +30,14 @@ jobs:
       #   run: |
       #     git config --local user.name "github-actions[bot]"
       #     git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      
-      # - name: Run V2EX checkin script
-      #   env:
-      #     V2EX_COOKIES: ${{ secrets.V2EX_COOKIES }}
-      #   run: |
-      #     python v2ex/v2ex.py
+
+      - name: Run V2EX checkin script
+        env:
+          V2EX_COOKIE: ${{ secrets.V2EX_COOKIE }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python -m v2ex.v2ex
 
       - name: Run Nodeseek checkin script
         env:
