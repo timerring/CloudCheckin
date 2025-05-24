@@ -8,6 +8,7 @@ Automatically perform daily check-ins on my frequently-used platforms.
 
 - Nodeseek
 - V2EX
+- 1point3acres
 
 ## How to use
 
@@ -36,3 +37,4 @@ You can also manually trigger the workflow through the Actions tab in the GitHub
 
 - [nodeseek](https://github.com/xinycai/nodeseek_signin)
 - [V2EX](https://github.com/CruiseTian/action-hub)
+- [1point3acres](https://github.com/harryhare/1point3acres)
