@@ -30,14 +30,14 @@ class OnePointThreeAcres:
 		}
 
 	def daily_checkin(self):
-		result = solver.turnstile(sitekey=self.cf_capcha_site_key, url=self.checkin_page, useragent=self.user_agent)
-		print(result)
+		result = self.solver.turnstile(sitekey=self.cf_capcha_site_key, url=self.checkin_page, useragent=self.user_agent)
+		# print(result)
 		code = result["code"]
-
+		# Restriction: 您的今日想说内容少于6个字母或3个中文字，请修改后再次提交！
 		emoji_list = ['kx', 'ng', 'ym', 'wl', 'nu', 'ch', 'fd', 'yl', 'shuai']
 		body = {
 			"qdxq": random.choice(emoji_list),
-			"todaysay": "gm",
+			"todaysay": "没有太多想说的",
 			"captcha_response": code,
 			"hashkey": "",
 			"version": 2
@@ -57,7 +57,7 @@ class OnePointThreeAcres:
 			return False
 		else:
 			resp_json = json.loads(response.text)
-			print(resp_json["msg"])
+			# print(resp_json["msg"])
 			send_tg_notification(resp_json["msg"])
 			return True
 
@@ -86,14 +86,14 @@ class OnePointThreeAcres:
 		question_id = resp_json["question"]["id"]
 		question = resp_json["question"]["qc"]
 		question = question.strip()
-		print(f"The question of 1point3acres is: {question}")
+		# print(f"The question of 1point3acres is: {question}")
 		send_tg_notification(f"The question of 1point3acres is: {question}")
 		answers = {}
 		answers[1] = resp_json["question"]["a1"]
 		answers[2] = resp_json["question"]["a2"]
 		answers[3] = resp_json["question"]["a3"]
 		answers[4] = resp_json["question"]["a4"]
-		print(f"The options of 1point3acres are: {answers}")
+		# print(f"The options of 1point3acres are: {answers}")
 		send_tg_notification(f"The options of 1point3acres are: {answers}")
 		answer = ""
 		answer_id = 0
@@ -101,9 +101,10 @@ class OnePointThreeAcres:
 			answer = questions[question]
 			for k in answers:
 				if answers[k] in answer:
-					print(f"find answer: {answers[k]} option value: {k} ")
+					# print(f"find answer: {answers[k]} option value: {k} ")
 					answer_id = k
 			if answer_id == "":
+				print(f"The question: {question}")
 				print(f"answer not found: {answer}")
 				print("欢迎提交 PR 更新问题到 question.py https://github.com/timerring/daily-actions")
 				send_tg_notification(f"answer not found: {answer}, 欢迎提交 PR 更新问题到 https://github.com/timerring/daily-actions")
@@ -115,7 +116,7 @@ class OnePointThreeAcres:
 
 	def answer_daily_question(self, question: int, answer: int) -> bool:
 		result = self.solver.turnstile(sitekey=self.cf_capcha_site_key, url=self.question_page, useragent=self.user_agent)
-		print(result)
+		# print(result)
 		code = result["code"]
 		captcha_id = result["captchaId"]
 
