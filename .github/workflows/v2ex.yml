@@ -1,4 +1,4 @@
-name: Run Daily Actions
+name: Run V2EX Actions
 
 on:
   schedule:

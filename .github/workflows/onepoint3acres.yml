@@ -1,4 +1,4 @@
-name: Run Daily Actions
+name: Run OnePoint3Acres Actions
 
 on:
   schedule:
