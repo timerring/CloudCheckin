@@ -1,8 +1,19 @@
 # My Daily Actions
 
-这个仓库包含了多个 GitHub Action，用于自动执行每日签到以及自动答题等任务。
+<div align="center">
+  <picture>
+    <img src="https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-05-25-14-45-17.png" alt="workflow"  width="500" height="500"/>
+  </picture>
+
+本仓库采用 GitHub Action 实现每日签到以及自动答题等任务功能。
+
+[English Version](./README-en.md) |
+中文版本 |
+</div>
 
 ## 功能
+
+> 欢迎 :star:，添加更多平台欢迎 issue 或者 PR。
 
 每天自动完成平台任务，完成以后会通过 telegram 机器人通知，如果失败则会直接通过 Github 发送邮件通知。
 
@@ -14,9 +25,11 @@
   - 自动签到
   - 自动答题
 
-## 如何使用
+## 快速开始
 
-> 如果不需要某个平台，可以直接删除 `.github/workflows` 目录下的对应平台的 workflow 文件。
+Fork 本仓库到你自己的仓库，然后添加对应的配置项到仓库的 secrets 中（在 settings -> secrets and variables -> actions -> new repository secret）。然后等待工作流自动运行即可，非常简单无需别的操作。
+
+> 如果不需要某个平台，可以直接删除 `.github/workflows` 目录下该平台对应的 workflow 文件即可。
 
 ### 配置 Telegram 通知
 

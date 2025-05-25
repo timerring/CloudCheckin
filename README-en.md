@@ -1,8 +1,20 @@
 # My Daily Actions
 
-This repository contains multiple GitHub Actions for automating daily check-ins and automated question answering tasks.
+
+<div align="center">
+  <picture>
+    <img src="https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-05-25-14-45-17.png" alt="workflow"  width="500" height="500"/>
+  </picture>
+
+This repository uses GitHub Actions to automate daily check-ins and automated question answering tasks.
+
+English Version |
+[中文版本](./README.md) |
+</div>
 
 ## Features
+
+> More platforms are welcome to issue or PR.
 
 Automatically completes platform tasks daily, with notifications sent through a telegram bot upon completion. If failures occur, notifications are sent directly via Github email.
 
@@ -15,6 +27,10 @@ Automatically completes platform tasks daily, with notifications sent through a 
   - Automatic question answering
 
 ## How to Use
+
+### Fork the repository
+
+Fork the repository to your own. Then add the secrets to the repository. Then just wait for the workflow to run.
 
 > If you don't need a particular platform, you can simply delete the corresponding platform's workflow file in the `.github/workflows` directory.
 
