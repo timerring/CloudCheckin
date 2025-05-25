@@ -2,13 +2,13 @@
 
 <div align="center">
   <picture>
-    <img src="https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-05-25-14-45-17.png" alt="workflow"  width="500" height="500"/>
+    <img src="https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-05-25-14-57-31.png" alt="workflow"  width="500" height="300"/>
   </picture>
 
 本仓库采用 GitHub Action 实现每日签到以及自动答题等任务功能。
 
 [English Version](./README-en.md) |
-中文版本 |
+中文版本
 </div>
 
 ## 功能

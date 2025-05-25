@@ -3,13 +3,13 @@
 
 <div align="center">
   <picture>
-    <img src="https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-05-25-14-45-17.png" alt="workflow"  width="500" height="500"/>
+    <img src="https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-05-25-14-57-31.png" alt="workflow"  width="500" height="300"/>
   </picture>
 
 This repository uses GitHub Actions to automate daily check-ins and automated question answering tasks.
 
 English Version |
-[中文版本](./README.md) |
+[中文版本](./README.md)
 </div>
 
 ## Features
