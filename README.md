@@ -1,4 +1,4 @@
-# My Daily Actions
+# Daily Actions
 
 <div align="center">
   <picture>
@@ -67,6 +67,6 @@ Fork 本仓库到你自己的仓库，然后添加对应的配置项到仓库的
 
 ## 参考
 
-- [nodeseek](https://github.com/xinycai/nodeseek_signin)
+- [1point3acres](https://github.com/harryhare/1point3acres)
 - [V2EX](https://github.com/CruiseTian/action-hub)
-- [一亩三分地](https://github.com/harryhare/1point3acres)
+- [nodeseek](https://github.com/xinycai/nodeseek_signin)
