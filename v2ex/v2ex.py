@@ -64,6 +64,7 @@ def check_in(once: str) -> bool:
     reg = r"已成功领取每日登录奖励"
     if re.search(reg, content):
         message += "Check in successfully\n"
+        send_tg_notification(message)
         return True
     else:
         message += "Fail to check in\n"
