@@ -1,0 +1,51 @@
+name: Setup CircleCI Context and Secrets
+
+on:
+  push:
+    branches: 
+      - main
+  workflow_dispatch:
+
+jobs:
+  setup-circleci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install CircleCI CLI
+        run: |
+          curl -fLSs https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/master/install.sh | sudo bash
+
+      - name: Setup CircleCI CLI
+        run: |
+          circleci setup --no-prompt --host=https://circleci.com --token=${{ secrets.CIRCLECI_TOKEN }}
+
+      - name: Delete CircleCI Context
+        run: |
+          circleci context delete --org-id ${{ secrets.CIRCLECI_ORG_ID }} checkincontext --force
+
+      - name: Create CircleCI Context
+        run: |
+          circleci context create --org-id ${{ secrets.CIRCLECI_ORG_ID }} checkincontext
+
+      - name: Migrate Secrets to CircleCI Context
+        env:
+          ORG_ID: ${{ secrets.CIRCLECI_ORG_ID }}
+        run: |
+          # Function to safely store a secret
+          store_secret() {
+            local secret_name=$1
+            local secret_value=$2
+            if [ -n "$secret_value" ]; then
+              echo "Storing secret: $secret_name"
+              echo "$secret_value" | circleci context store-secret --org-id "$ORG_ID" checkincontext "$secret_name"
+            else
+              echo "Warning: $secret_name is empty, skipping"
+            fi
+          }
+
+          # List of secrets to migrate
+          store_secret "TELEGRAM_TOKEN" "${{ secrets.TELEGRAM_TOKEN }}"
+          store_secret "TELEGRAM_CHAT_ID" "${{ secrets.TELEGRAM_CHAT_ID }}"
+          store_secret "NODESEEK_COOKIE" "${{ secrets.NODESEEK_COOKIE }}"
+          store_secret "V2EX_COOKIE" "${{ secrets.V2EX_COOKIE }}"
+          store_secret "ONEPOINT3ACRES_COOKIE" "${{ secrets.ONEPOINT3ACRES_COOKIE }}"
+          store_secret "TWOCAPTCHA_APIKEY" "${{ secrets.TWOCAPTCHA_APIKEY }}"
