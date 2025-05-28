@@ -209,8 +209,8 @@ class OnePointThreeAcres:
 
 
 if __name__ == "__main__":
-	cookie = os.environ.get('ONEPOINT3ACRES_COOKIE')
-	TwoCaptcha_apikey = os.environ.get('TWOCAPTCHA_APIKEY')
+	cookie = os.environ.get('ONEPOINT3ACRES_COOKIE').strip()
+	TwoCaptcha_apikey = os.environ.get('TWOCAPTCHA_APIKEY').strip()
 	
 	try:
 		if not cookie:
