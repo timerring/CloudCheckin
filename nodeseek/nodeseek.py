@@ -6,7 +6,7 @@ import time
 from telegram.notify import send_tg_notification
 
 # Get COOKIE from environment variable, multiple cookies separated by &
-cookies = os.getenv('NODESEEK_COOKIE')
+cookies = os.environ.get('NODESEEK_COOKIE')
 
 if not cookies:
     raise ValueError("Environment variable NODESEEK_COOKIE is not set")

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import sys
 from telegram.notify import send_tg_notification
 
-cookie = os.getenv('V2EX_COOKIE')
+cookie = os.environ.get('V2EX_COOKIE')
 # Initial the message time
 time = datetime.now() + timedelta(hours=8)
 message = time.strftime("%Y/%m/%d %H:%M:%S") + " from V2EX \n"

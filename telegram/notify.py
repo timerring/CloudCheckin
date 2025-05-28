@@ -5,10 +5,10 @@ import os
 import sys
 
 # follow the instructions from https://core.telegram.org/bots/features#botfather and get the bot token
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
 # add the bot to your contact and send a message to it
 # then check the url https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates to get the chat id
-TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID')
 
 def send_tg_notification(message):
     """Send Telegram notification

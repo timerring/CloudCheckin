@@ -1,0 +1,69 @@
+version: 2.1
+
+jobs:
+  nodeseek:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            python -m pip install --upgrade pip
+            pip install curl_cffi
+      - run:
+          name: Run Nodeseek signin
+          command: |
+            python -m nodeseek.nodeseek
+
+  v2ex:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            python -m pip install --upgrade pip
+            pip install curl_cffi
+      - run:
+          name: Run V2EX signin
+          command: |
+            python -m v2ex.v2ex
+
+  onepoint3acres:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            python -m pip install --upgrade pip
+            pip install requests 2captcha-python
+      - run:
+          name: Run 1point3acres signin
+          command: |
+            python -m onepoint3acres.onepoint3acres
+
+workflows:
+  version: 2
+  daily_actions:
+    triggers:
+      - schedule:
+          cron: "0 9 * * *"  # UTC 09:00 (Beijing 17:00)
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - nodeseek
+      - v2ex
+      - onepoint3acres
+  
+  # Allow manual triggers
+  manual_trigger:
+    jobs:
+      - nodeseek
+      - v2ex
+      - onepoint3acres 
