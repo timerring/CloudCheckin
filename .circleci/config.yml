@@ -57,13 +57,19 @@ workflows:
               only:
                 - main
     jobs:
-      - nodeseek
-      - v2ex
-      - onepoint3acres
+      - nodeseek:
+          context: checkincontext
+      - v2ex:
+          context: checkincontext
+      - onepoint3acres:
+          context: checkincontext
   
   # Allow manual triggers
   manual_trigger:
     jobs:
-      - nodeseek
-      - v2ex
-      - onepoint3acres 
+      - nodeseek:
+          context: checkincontext
+      - v2ex:
+          context: checkincontext
+      - onepoint3acres:
+          context: checkincontext
