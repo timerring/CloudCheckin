@@ -1,6 +1,11 @@
 name: Setup CircleCI Context and Secrets
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - '.circleci/config.yml'
   workflow_dispatch:
 
 jobs:
