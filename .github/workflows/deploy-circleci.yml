@@ -35,8 +35,13 @@ jobs:
             local secret_name=$1
             local secret_value=$2
             
-            echo "Storing secret: $secret_name"
-            echo "$secret_value" | circleci context store-secret --org-id "${ORG_ID}" checkincontext "${secret_name}"
+            # Check if the secret value is not empty
+            if [ -n "$secret_value" ]; then
+              echo "Storing secret: $secret_name"
+              echo "$secret_value" | circleci context store-secret --org-id "${{ secrets.CIRCLECI_ORG_ID }}" checkincontext "${secret_name}"
+            else
+              echo "Skipping $secret_name: secret is empty or not set"
+            fi
           }
 
           # List of secrets to migrate
