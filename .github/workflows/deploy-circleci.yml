@@ -1,9 +1,6 @@
 name: Setup CircleCI Context and Secrets
 
 on:
-  push:
-    branches: 
-      - main
   workflow_dispatch:
 
 jobs:
