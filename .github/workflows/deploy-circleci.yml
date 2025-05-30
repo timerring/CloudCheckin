@@ -20,9 +20,13 @@ jobs:
         run: |
           circleci setup --no-prompt --host=https://circleci.com --token=${{ secrets.CIRCLECI_TOKEN }}
 
-      - name: Delete CircleCI Context
+      - name: Check and Delete CircleCI Context
         run: |
-          circleci context delete --org-id ${{ secrets.CIRCLECI_ORG_ID }} checkincontext --force
+          if circleci context list --org-id ${{ secrets.CIRCLECI_ORG_ID }} | grep -q "checkincontext"; then
+            circleci context delete --org-id ${{ secrets.CIRCLECI_ORG_ID }} checkincontext --force
+          else
+            echo "Context does not exist, skipping deletion"
+          fi
 
       - name: Create CircleCI Context
         run: |
