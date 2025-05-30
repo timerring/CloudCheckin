@@ -75,7 +75,7 @@ https://github.com/timerring/CloudCheckin/blob/600af66568069ad14b6e5cff7cbfed99f
 <summary>配置 V2EX 签到</summary>
 
 1. 从 V2EX 网站获取 `cookie`（获取方法请参考 [COOKIE 获取教程](https://blog.timerring.com/posts/the-way-to-get-cookie/)）
-2. 注意，由于 V2EX 的 cookie 包含 `"` 以及 `$` 特殊字符，可能会导致 sh 中传递失败，因此需要转义这两个特殊字符，简单脚本为 `echo 'cookie' | sed 's/["$]/\\&/g'`。
+2. 注意，由于 V2EX 的 cookie 包含 `"` 以及 `$` 特殊字符，可能会导致 sh 中传递 secrets 失败，因此需要转义这两个特殊字符，简单替换脚本为 `echo '你的V2EX cookie' | sed 's/["$]/\\&/g'`。
 3. 将转义后的 `cookie` 添加到仓库密钥中，命名为 `V2EX_COOKIE`
 </details>
 
@@ -101,9 +101,16 @@ https://github.com/timerring/CloudCheckin/blob/600af66568069ad14b6e5cff7cbfed99f
 
 2. 为什么不采用 Cloudflare Worker 等 Serverless 函数计算？
    
-   已经尝试过 Cloudflare Worker，本地 wrangler dev 有效，但是 deploy Cloudflare Worker 之后，由于 Cloudflare edge 请求会带有明显的 cf 标志，很多平台已经限制了 Cloudflare Worker 的请求。至于更多的函数计算平台还在尝试中，有进展会同步在 Repo 里。
+   已经尝试过 Cloudflare Worker，本地 wrangler dev 有效，但是 deploy Cloudflare Worker 之后，由于 Cloudflare edge 请求会带有明显的 cf 标志，很多平台已经限制了 Cloudflare Worker 的请求。至于更多的函数计算平台还在尝试中，有进展会同步在 Repo 里。当然，如果你对 Cloudflare Worker 的方式有兴趣，欢迎继续尝试的工作，我本地调试的 demo 已经放置于 `cloudflareworkers` 目录下。
+
+## 贡献
+
+欢迎提交你需要的平台，语言不限制。
+
+> 如果你是 Python 用户，建议使用 `curl_cffi` 库而不是 `requests` 等库，`curl_cffi` 能够更精确地模拟浏览器发送请求，极大程度上防止网站风控。
 
 ## 参考
+- [curl_cffi](https://github.com/lexiforest/curl_cffi)
 - [2captcha](https://github.com/2captcha/2captcha-python)
 - [1point3acres](https://github.com/harryhare/1point3acres)
 - [V2EX](https://github.com/CruiseTian/action-hub)
