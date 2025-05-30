@@ -1,0 +1,15 @@
+name = "v2ex-checkin-worker"
+main = "src/v2ex.js"
+compatibility_date = "2024-03-29"
+
+# Enable logging
+[logs]
+# Send logs to Cloudflare
+production = true
+
+[vars]
+V2EX_COOKIE = """"""
+
+# Uncomment to enable daily auto check-in at 8:00 AM Beijing time
+# [triggers]
+# crons = ["0 0 * * *"]
