@@ -1,0 +1,21 @@
+name = "nodeseek-checkin-worker"
+main = "src/nodeseek.js"
+compatibility_date = "2024-03-29"
+
+# Disable IPv6 and force IPv4 only
+compatibility_flags = ["no_global_navigator"]
+
+# Force IPv4 only for outbound requests
+[env.production]
+compatibility_flags = ["no_global_navigator"]
+
+[vars]
+# Multiple cookies separated by &
+NODESEEK_COOKIE = """"your cookies""""
+
+[observability.logs]
+enabled = true
+
+# Enable daily auto check-in at 8:00 AM Beijing time (UTC 0:00)
+[triggers]
+crons = ["0 0 * * *"] 
