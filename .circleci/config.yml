@@ -51,7 +51,7 @@ workflows:
   daily_actions:
     triggers:
       - schedule:
-          cron: "0 9 * * *"  # UTC 09:00 (Beijing 17:00)
+          cron: "0 2 * * *"  # UTC 02:00 (Beijing 10:00)
           filters:
             branches:
               only:
