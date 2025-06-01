@@ -4,3 +4,6 @@ compatibility_date = "2024-01-15"
 
 [triggers]
 crons = ["0 2 * * *"]  # UTC 2:00 = (Beijing) UTC+8 10:00
+
+[observability.logs]
+enabled = true
