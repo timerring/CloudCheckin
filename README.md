@@ -1,18 +1,17 @@
-# Cloud Checkin
+# CloudCheckin
 
 <div align="center">
   <picture>
-    <img src="https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-05-29-12-15-02.png" alt="workflow"  width="500" height="300"/>
+    <img src="https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-06-01-17-47-19.png" alt="workflow"  width="200" height="100"/>
   </picture>
 
-本仓库采用 CI/CD 实现每日签到以及自动答题等任务功能。
+基于 CI/CD 以及 Cloudflare Workers 实现多平台自动签到以及答题。
 
 [English Version](./README-en.md) |
 中文版本
 </div>
 
 ## 功能
-
 > 欢迎 :star:，添加更多平台欢迎 issue 或者 PR。
 
 每天自动完成平台任务，完成以后会通过 telegram 机器人通知，如果失败则会直接通过 CircleCI 发送邮件通知。
@@ -25,6 +24,10 @@
   - 自动签到
   - 自动答题
 
+## 架构图
+
+![](https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-06-01-17-53-56.png)
+
 ## 快速开始
 
 Fork 本仓库到你自己的仓库，然后添加对应的配置项到仓库的 secrets 中（在 `settings -> secrets and variables -> actions -> new repository secret`）。
@@ -34,6 +37,9 @@ Fork 本仓库到你自己的仓库，然后添加对应的配置项到仓库的
 [CircleCI](https://circleci.com/) 是一个优秀的 CI/CD 平台，Free plan 的 `30,000 credits/mo, that’s up to 6,000 build mins` 完全可以支撑起本项目的所有需求。
 
 详细的注册教程请见 [CloudCheckin Wiki](https://github.com/timerring/CloudCheckin/wiki/CircleCI-Registeration)。
+
+> [!IMPORTANT]
+> **注意 trigger 的 `CIRCLECI_WEBHOOK_URL` 拼接完成后填写在 Github Actions 的 secrets 中**。
 
 ### 申请 CircleCI Token
 
@@ -45,15 +51,20 @@ Fork 本仓库到你自己的仓库，然后添加对应的配置项到仓库的
 
 ![](https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-05-30-13-25-46.png)
 
+### 配置 Cloudflare Worker
+
+1. 登录 [Cloudflare](https://dash.cloudflare.com/login) 账号，[在 `Profile` 页面](https://dash.cloudflare.com/profile/api-tokens) 创建 `Create Token`(建议 `Edit Cloudflare Workers` 模板保持默认就好)。
+2. 将该 Token 添加到仓库的 secrets 中，命名为 `CLOUDFLARE_API_TOKEN`。
+
 ### 设置任务定时
 
-可以自行修改 `config.yml` 设置任务定时，注意执行时间固定为 UTC 时区，北京时间为 UTC+8 时区，请自行转换时差。
+可以自行修改 `wrangler.toml` 设置任务定时 cron 字段，注意执行时间固定为 UTC 时区，北京时间为 UTC+8 时区，请自行转换时差。
 
-https://github.com/timerring/CloudCheckin/blob/600af66568069ad14b6e5cff7cbfed99fc236fd0/.circleci/config.yml#L54
+https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a71631f7/wrangler.toml#L6
 
 ### 配置平台
 
-> 如果不需要某个平台，可以直接编辑删除 `.circleci/config.yml` 目录下该平台对应的项即可，例如无需一亩三分地，可以考虑删除 64-65, 74-75 行。
+> 如果不需要某个平台，可以直接编辑删除 `.circleci/config.yml` 目录下该平台对应的项即可，例如无需一亩三分地，可以考虑删除 57-58 行。
 
 #### 配置 Telegram 通知
 
@@ -91,7 +102,7 @@ https://github.com/timerring/CloudCheckin/blob/600af66568069ad14b6e5cff7cbfed99f
 
 #### 同步配置
 
-配置完成所有内容后，请手动执行一次 `Setup CircleCI Context and Secrets` workflow 确保配置 secrets 通过 CircleCI CLI 正确同步至 CircleCI contexts secrets。（Actions -> `Setup CircleCI Context and Secrets` -> `Run workflow`）
+配置完成所有内容后，请手动执行一次 `Setup CircleCI Context and Secrets` 以及 `Deploy Cloudflare Worker` workflow 确保配置 secrets 通过 CircleCI CLI 正确同步至 CircleCI contexts secrets，并将 Cloudflare Worker 正确部署。（Actions -> `Setup CircleCI Context and Secrets` -> `Run workflow` 以及 Actions -> `Deploy Cloudflare Worker` -> `Run workflow`）
 
 ## 常见问题
 
@@ -102,6 +113,9 @@ https://github.com/timerring/CloudCheckin/blob/600af66568069ad14b6e5cff7cbfed99f
 2. 为什么不采用 Cloudflare Worker 等 Serverless 函数计算？
    
    已经尝试过 Cloudflare Worker，本地 wrangler dev 有效，但是 deploy Cloudflare Worker 之后，由于 Cloudflare edge 请求会带有明显的 cf 标志，很多平台已经限制了 Cloudflare Worker 的请求。至于更多的函数计算平台还在尝试中，有进展会同步在 Repo 里。当然，如果你对 Cloudflare Worker 的方式有兴趣，欢迎继续尝试的工作，我本地调试的 demo 已经放置于 `cloudflareworkers` 目录下。
+
+3. 为什么要切换到 Cloudflare Worker 作为 Webhook 触发器，不用 CircleCI 的 Scheduled？
+   根据 [CircleCI 的最新条款](https://circleci.com/docs/version-control-system-integration-overview/#pipeline-triggers-and-integrations)，Scheduled pipelines 将不对 `GitHub App` 下的个人仓库开放，因此需要切换到 [Custom Webhook](https://circleci.com/docs/custom-webhooks/) 的形式，通过 Cloudflare Worker 作为定时触发器，当然你也可以采用[其他方式调用 Webhook](https://circleci.com/docs/triggers-overview/#trigger-a-pipeline-from-a-custom-webhook)，只需要定时调用 Webhook 的接口即可，这里我采用了 Cloudflare Worker 作为定时触发器。
 
 ## 贡献
 

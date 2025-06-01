@@ -1,19 +1,17 @@
-# Daily Actions
-
+# CloudCheckin
 
 <div align="center">
   <picture>
-    <img src="https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-05-29-12-15-02.png" alt="workflow"  width="500" height="300"/>
+    <img src="https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-06-01-17-47-19.png" alt="workflow"  width="200" height="100"/>
   </picture>
 
-This repository uses CI/CD to automate daily check-ins and automated question answering tasks.
+Multi-platform automatic check-in and quiz automation based on CI/CD and Cloudflare Workers.
 
 English Version |
 [中文版本](./README.md)
 </div>
 
 ## Features
-
 > Welcome to :star: this project. Feel free to submit issues or PRs to add more platforms.
 
 Automatically complete platform tasks daily. After completion, notifications will be sent via Telegram bot. If tasks fail, email notifications will be sent directly through CircleCI.
@@ -22,9 +20,13 @@ Automatically complete platform tasks daily. After completion, notifications wil
   - Automatic check-in
 - **V2EX**
   - Automatic check-in
-- **1point3acres**
+- **1Point3Acres**
   - Automatic check-in
-  - Automatic question answering
+  - Automatic quiz completion
+
+## Architecture
+
+![](https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-06-01-17-53-56.png)
 
 ## Quick Start
 
@@ -36,6 +38,9 @@ Fork this repository to your own account, then add the corresponding configurati
 
 For detailed registration instructions, please see [CloudCheckin Wiki](https://github.com/timerring/CloudCheckin/wiki/CircleCI-Registeration).
 
+> [!IMPORTANT]
+> **Note: After completing the trigger `CIRCLECI_WEBHOOK_URL` concatenation, fill it in the GitHub Actions secrets**.
+
 ### Apply for CircleCI Token
 
 Apply for a Token on the [CircleCI](https://app.circleci.com/settings/user/tokens) page and add it to your repository secrets with the name `CIRCLECI_TOKEN`.
@@ -46,15 +51,20 @@ Find the Organization ID in your created Organization Settings and add it to you
 
 ![](https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-05-30-13-25-46.png)
 
+### Configure Cloudflare Worker
+
+1. Log in to your [Cloudflare](https://dash.cloudflare.com/login) account, [create a token on the `Profile` page](https://dash.cloudflare.com/profile/api-tokens) using `Create Token` (recommend using the `Edit Cloudflare Workers` template with default settings).
+2. Add this Token to your repository secrets with the name `CLOUDFLARE_API_TOKEN`.
+
 ### Set Task Schedule
 
-You can modify `config.yml` to set task schedules. Note that execution time is fixed to UTC timezone. Beijing time is UTC+8, so please convert the time difference accordingly.
+You can modify the cron field in `wrangler.toml` to set task schedules. Note that execution time is fixed to UTC timezone. Beijing time is UTC+8, so please convert the time difference accordingly.
 
-https://github.com/timerring/CloudCheckin/blob/600af66568069ad14b6e5cff7cbfed99fc236fd0/.circleci/config.yml#L54
+https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a71631f7/wrangler.toml#L6
 
 ### Configure Platforms
 
-> If you don't need a certain platform, you can directly edit and delete the corresponding items in `.circleci/config.yml`. For example, if you don't need 1Point3Acres, consider deleting lines 64-65 and 74-75.
+> If you don't need a certain platform, you can directly edit and delete the corresponding items in `.circleci/config.yml`. For example, if you don't need 1Point3Acres, consider deleting lines 57-58.
 
 #### Configure Telegram Notifications
 
@@ -94,7 +104,7 @@ https://github.com/timerring/CloudCheckin/blob/600af66568069ad14b6e5cff7cbfed99f
 
 #### Sync Configuration
 
-After configuring all content, please manually execute the `Setup CircleCI Context and Secrets` workflow once to ensure that configuration secrets are correctly synchronized to CircleCI contexts secrets through CircleCI CLI. (Actions -> `Setup CircleCI Context and Secrets` -> `Run workflow`)
+After configuring all content, please manually execute the `Setup CircleCI Context and Secrets` and `Deploy Cloudflare Worker` workflows once to ensure that configuration secrets are correctly synchronized to CircleCI contexts secrets through CircleCI CLI, and that the Cloudflare Worker is properly deployed. (Actions -> `Setup CircleCI Context and Secrets` -> `Run workflow` and Actions -> `Deploy Cloudflare Worker` -> `Run workflow`)
 
 ## FAQ
 
@@ -104,7 +114,11 @@ After configuring all content, please manually execute the `Setup CircleCI Conte
 
 2. **Why not use Cloudflare Worker or other Serverless computing functions?**
    
-   We have tried Cloudflare Worker. Local `wrangler dev` works, but after deploying to Cloudflare Worker, since Cloudflare edge requests carry obvious cf flags, many platforms have restricted Cloudflare Worker requests. We are still trying more function computing platforms, and any progress will be synchronized in the repository. Of course, if you are interested in the Cloudflare Worker approach, you are welcome to continue trying the work. My local debugging demo is already placed in the `cloudflareworkers` directory.
+   We have tried Cloudflare Worker. Local `wrangler dev` works, but after deploying to Cloudflare Worker, since Cloudflare edge requests carry obvious cf flags, many platforms have restricted Cloudflare Worker requests. We are still trying more function computing platforms, and any progress will be synchronized in the repository. Of course, if you are interested in the Cloudflare Worker approach, you are welcome to continue the work. The demo I debugged locally has been placed in the `cloudflareworkers` directory.
+
+3. **Why switch to Cloudflare Worker as a Webhook trigger instead of using CircleCI's Scheduled?**
+   
+   According to [CircleCI's latest terms](https://circleci.com/docs/version-control-system-integration-overview/#pipeline-triggers-and-integrations), Scheduled pipelines will not be available for personal repositories under `GitHub App`, so we need to switch to [Custom Webhook](https://circleci.com/docs/custom-webhooks/) format, using Cloudflare Worker as a scheduled trigger. Of course, you can also use [other ways to call Webhook](https://circleci.com/docs/triggers-overview/#trigger-a-pipeline-from-a-custom-webhook), just need to call the Webhook interface regularly. Here I use Cloudflare Worker as the scheduled trigger.
 
 ## Contributing
 
