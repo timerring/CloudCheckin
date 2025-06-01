@@ -26,35 +26,35 @@ export default {
       }
     },
   
-    // async fetch(request, env, ctx) {
-    //   // Test endpoint
-    //   if (request.url.includes('/test')) {
-    //     try {
-    //       const WEBHOOK_URL = env.CIRCLECI_WEBHOOK_URL;
-    //       const response = await fetch(WEBHOOK_URL, {
-    //         method: 'POST',
-    //         headers: {
-    //           'Content-Type': 'application/json',
-    //         },
-    //       });
+    async fetch(request, env, ctx) {
+      // Test endpoint
+      if (request.url.includes('/test')) {
+        try {
+          const WEBHOOK_URL = env.CIRCLECI_WEBHOOK_URL;
+          const response = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
           
-    //       const responseText = await response.text();
+          const responseText = await response.text();
           
-    //       return new Response(`Test request completed. Status: ${response.status}\nResponse: ${responseText}`, {
-    //         status: 200,
-    //         headers: { 'Content-Type': 'text/plain' }
-    //       });
-    //     } catch (error) {
-    //       return new Response(`Test failed: ${error.message}`, { 
-    //         status: 500,
-    //         headers: { 'Content-Type': 'text/plain' }
-    //       });
-    //     }
-    //   }
+          return new Response(`Test request completed. Status: ${response.status}\nResponse: ${responseText}`, {
+            status: 200,
+            headers: { 'Content-Type': 'text/plain' }
+          });
+        } catch (error) {
+          return new Response(`Test failed: ${error.message}`, { 
+            status: 500,
+            headers: { 'Content-Type': 'text/plain' }
+          });
+        }
+      }
       
-    //   return new Response('CircleCI Scheduler Worker is running', { 
-    //     status: 200,
-    //     headers: { 'Content-Type': 'text/plain' }
-    //   });
-    // }
+      return new Response('CircleCI Scheduler Worker is running', { 
+        status: 200,
+        headers: { 'Content-Type': 'text/plain' }
+      });
+    }
   };
