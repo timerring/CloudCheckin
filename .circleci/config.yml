@@ -47,23 +47,6 @@ jobs:
             python -m onepoint3acres.onepoint3acres
 
 workflows:
-  version: 2
-  daily_actions:
-    triggers:
-      - schedule:
-          cron: "0 2 * * *"  # UTC 02:00 (Beijing 10:00)
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - nodeseek:
-          context: checkincontext
-      - v2ex:
-          context: checkincontext
-      - onepoint3acres:
-          context: checkincontext
-  
   # Allow manual triggers
   manual_trigger:
     jobs:
