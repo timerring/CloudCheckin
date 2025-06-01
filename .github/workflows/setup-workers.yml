@@ -1,0 +1,41 @@
+name: Deploy Cloudflare Worker
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Cloudflare Workers
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Wrangler CLI
+        run: npm install -g wrangler
+
+      - name: Set up Worker secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CIRCLECI_WEBHOOK_URL: ${{ secrets.CIRCLECI_WEBHOOK_URL }}
+        run: |
+          if [ -n "$CIRCLECI_WEBHOOK_URL" ]; then
+            echo '$CIRCLECI_WEBHOOK_URL' | wrangler secret put CIRCLECI_WEBHOOK_URL
+          else
+            echo "CIRCLECI_WEBHOOK_URL not provided!"
+            exit 1
+          fi
+
+      - name: Deploy to Cloudflare Workers
+        run: wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
