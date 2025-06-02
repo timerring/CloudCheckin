@@ -1,6 +1,7 @@
 name = "circleci-scheduler"
 main = "worker.js"
 compatibility_date = "2024-01-15"
+account_id="ceb2110a22b4a41d050917e658366b38"
 
 [triggers]
 crons = ["0 2 * * *"]  # UTC 2:00 = (Beijing) UTC+8 10:00
