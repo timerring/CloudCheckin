@@ -24,9 +24,49 @@
   - 自动签到
   - 自动答题
 
-## 架构图
+## 架构及时序图
 
 ![](https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-06-01-17-53-56.png)
+
+```mermaid
+sequenceDiagram
+    participant User as User
+    participant CF as Cloudflare Worker<br/>(Scheduler)
+    participant CCI as CircleCI<br/>(CI/CD Pipeline)
+    participant SP as Platforms
+    participant TC as 2captcha
+    
+    Note over User: Configure Github secrets only once
+    User-->>CF: Auto deploy cloudlflare workers
+    User-->>CCI: Auto sync the secrets to CircleCI
+
+    rect rgb(240, 248, 255)
+        Note over CF: Cron runs every day
+
+        CF->>+CCI: Trigger Webhook
+        Note over CCI: Start jobs
+
+        loop Loop platforms
+            CCI->>+SP: Send Request checkin/QA<br/>(with Cookie)
+            
+            alt Request captcha
+                SP->>+TC: request 2captcha
+                TC->>-SP: bypass captcha
+            end
+            
+            SP->>-CCI: Return Response
+        end
+
+        alt Request success
+            CCI->>+User: Send notification<br/>(TELEGRAM_BOT)
+        else Request fail
+            CCI->>+User: Send email<br/>(CircleCI)
+        end
+
+        CCI-->>-CF: Completed
+        Note over CF: Wait for next turn
+    end
+```
 
 ## 快速开始
 
