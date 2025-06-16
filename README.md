@@ -26,7 +26,9 @@
 
 ## 架构及时序图
 
-![](https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-06-01-17-53-56.png)
+<div align="center">
+<img src="https://cdn.jsdelivr.net/gh/timerring/scratchpad2023/2024/2025-06-01-17-53-56.png" width="50%" alt="Arch">
+</div>
 
 ```mermaid
 sequenceDiagram
@@ -143,6 +145,9 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 #### 同步配置
 
 配置完成所有内容后，请手动执行一次 `Setup CircleCI Context and Secrets` 以及 `Deploy Cloudflare Worker` workflow 确保配置 secrets 通过 CircleCI CLI 正确同步至 CircleCI contexts secrets，并将 Cloudflare Worker 正确部署。（Actions -> `Setup CircleCI Context and Secrets` -> `Run workflow` 以及 Actions -> `Deploy Cloudflare Worker` -> `Run workflow`）
+
+> [!IMPORTANT]
+> 有时 cookie 会过期导致签到失败，如果遇到失败情况，请考虑重新获取 cookie 填入 Secrets，再手动执行 `Setup CircleCI Context and Secrets` workflow 同步 cookie 到 CircleCI。
 
 ## 常见问题
 
