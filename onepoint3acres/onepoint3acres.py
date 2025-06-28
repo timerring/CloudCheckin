@@ -210,31 +210,53 @@ class OnePointThreeAcres:
 
 if __name__ == "__main__":
 	cookie = os.environ.get('ONEPOINT3ACRES_COOKIE').strip()
+	cookie2 = os.environ.get('ONEPOINT3ACRES_COOKIE_2').strip()
 	TwoCaptcha_apikey = os.environ.get('TWOCAPTCHA_APIKEY').strip()
 	
 	try:
 		if not cookie:
 			raise ValueError("Environment variable ONEPOINT3ACRES_COOKIE is not set")
+		if not cookie2:
+			raise ValueError("Environment variable ONEPOINT3ACRES_COOKIE_2 is not set")
 		if not TwoCaptcha_apikey:
 			raise ValueError("Environment variable TWOCAPTCHA_APIKEY is not set")
 		
 		# initialize the solver
 		solver = TwoCaptcha(TwoCaptcha_apikey)
+		
+		# For Account 1
 		# Create the instance
 		acres = OnePointThreeAcres(cookie, solver)
 
 		# daily checkin
 		daily_checkin_status = acres.daily_checkin()
 		if not daily_checkin_status:
-			send_tg_notification("Fail to check in the 1point3acres")
+			send_tg_notification("Fail to check in the 1point3acres for Account 1 (Main)")
 		# daily question
 		question_id, answer_id = acres.get_daily_task_answer()
 		if not question_id or not answer_id:
-			raise ValueError("Fail to get daily question")
+			raise ValueError("Fail to get daily question for Account 1 (Main)")
 		time.sleep(random.uniform(1, 50))
 		answer_daily_question_status = acres.answer_daily_question(question_id, answer_id)
 		if not answer_daily_question_status:
-			raise ValueError("Fail to answer daily question")
+			raise ValueError("Fail to answer daily question for Account 1 (Main)")
+		
+		# For Account 2
+		# Create the instance
+		acres2 = OnePointThreeAcres(cookie2, solver)
+
+		# daily checkin
+		daily_checkin_status2 = acres2.daily_checkin()
+		if not daily_checkin_status2:
+			send_tg_notification("Fail to check in the 1point3acres for Account 2")
+		# daily question
+		question_id2, answer_id2 = acres2.get_daily_task_answer()
+		if not question_id2 or not answer_id2:
+			raise ValueError("Fail to get daily question for Account 2")
+		time.sleep(random.uniform(1, 50))
+		answer_daily_question_status2 = acres2.answer_daily_question(question_id2, answer_id2)
+		if not answer_daily_question_status2:
+			raise ValueError("Fail to answer daily question for Account 2")
 		
 	except Exception as err:
 		print(err, flush=True)
