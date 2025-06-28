@@ -56,4 +56,5 @@ jobs:
           store_secret "NODESEEK_COOKIE" "${{ secrets.NODESEEK_COOKIE }}"
           store_secret "V2EX_COOKIE" "${{ secrets.V2EX_COOKIE }}"
           store_secret "ONEPOINT3ACRES_COOKIE" "${{ secrets.ONEPOINT3ACRES_COOKIE }}"
+          store_secret "ONEPOINT3ACRES_COOKIE_2" "${{ secrets.ONEPOINT3ACRES_COOKIE_2 }}"
           store_secret "TWOCAPTCHA_APIKEY" "${{ secrets.TWOCAPTCHA_APIKEY }}"
