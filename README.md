@@ -149,6 +149,21 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 > [!IMPORTANT]
 > 有时 cookie 会过期导致签到失败，如果遇到失败情况，请考虑重新获取 cookie 填入 Secrets，再手动执行 `Setup CircleCI Context and Secrets` workflow 同步 cookie 到 CircleCI。
 
+## 本地调试
+
+```bash
+# 安装依赖
+pip install -r requirements.txt
+
+# 复制环境变量模板并填入你的配置
+cp .env.test .env
+
+# 运行签到脚本
+python -m nodeseek.nodeseek
+python -m v2ex.v2ex
+python -m onepoint3acres.onepoint3acres
+```
+
 ## 常见问题
 
 1. 为什么要采用 CircleCI，不直接用 Github Actions？

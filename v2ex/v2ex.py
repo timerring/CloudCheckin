@@ -3,9 +3,12 @@ import re
 import os
 from datetime import datetime, timedelta
 import sys
+from dotenv import load_dotenv
 from telegram.notify import send_tg_notification
 
-cookie = os.environ.get('V2EX_COOKIE').strip()
+load_dotenv()
+
+cookie = os.environ.get('V2EX_COOKIE', '').strip()
 # Initial the message time
 time = datetime.now() + timedelta(hours=8)
 message = time.strftime("%Y/%m/%d %H:%M:%S") + " from V2EX \n"
@@ -24,7 +27,7 @@ headers = {
     "sec-fetch-user": "?1",
     "upgrade-insecure-requests": "1",
     "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-    "cookie": f"'{cookie}'",
+    "cookie": cookie,
 }
 
 def get_once() -> tuple[str, bool]:
