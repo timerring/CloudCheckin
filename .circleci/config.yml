@@ -10,7 +10,7 @@ jobs:
           name: Install dependencies
           command: |
             python -m pip install --upgrade pip
-            pip install curl_cffi
+            pip install curl_cffi python-dotenv
       - run:
           name: Run Nodeseek signin
           command: |
@@ -25,7 +25,7 @@ jobs:
           name: Install dependencies
           command: |
             python -m pip install --upgrade pip
-            pip install curl_cffi
+            pip install curl_cffi python-dotenv
       - run:
           name: Run V2EX signin
           command: |
@@ -40,7 +40,7 @@ jobs:
           name: Install dependencies
           command: |
             python -m pip install --upgrade pip
-            pip install requests 2captcha-python
+            pip install requests 2captcha-python python-dotenv
       - run:
           name: Run 1point3acres signin
           command: |
