@@ -156,7 +156,7 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 pip install -r requirements.txt
 
 # 复制环境变量模板并填入你的配置
-cp .env.test .env
+cp .env.localtest.example .env
 
 # 运行签到脚本
 python -m nodeseek.nodeseek

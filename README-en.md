@@ -113,7 +113,7 @@ After configuring all content, please manually execute the `Setup CircleCI Conte
 pip install -r requirements.txt
 
 # Copy env template and fill in your config
-cp .env.test .env
+cp .env.localtest.example .env
 
 # Run check-in scripts
 python -m nodeseek.nodeseek
