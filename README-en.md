@@ -106,6 +106,21 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 
 After configuring all content, please manually execute the `Setup CircleCI Context and Secrets` and `Deploy Cloudflare Worker` workflows once to ensure that configuration secrets are correctly synchronized to CircleCI contexts secrets through CircleCI CLI, and that the Cloudflare Worker is properly deployed. (Actions -> `Setup CircleCI Context and Secrets` -> `Run workflow` and Actions -> `Deploy Cloudflare Worker` -> `Run workflow`)
 
+## Local Development
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Copy env template and fill in your config
+cp .env.test .env
+
+# Run check-in scripts
+python -m nodeseek.nodeseek
+python -m v2ex.v2ex
+python -m onepoint3acres.onepoint3acres
+```
+
 ## FAQ
 
 1. **Why use CircleCI instead of GitHub Actions directly?**

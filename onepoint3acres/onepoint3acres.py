@@ -6,8 +6,11 @@ import os
 import requests
 import http.cookies
 import time
+from dotenv import load_dotenv
 from .questions import questions
 from telegram.notify import send_tg_notification
+
+load_dotenv()
 
 class OnePointThreeAcres:
 	def __init__(self, cookie: str, solver: TwoCaptcha):
@@ -209,8 +212,8 @@ class OnePointThreeAcres:
 
 
 if __name__ == "__main__":
-	cookie = os.environ.get('ONEPOINT3ACRES_COOKIE').strip()
-	TwoCaptcha_apikey = os.environ.get('TWOCAPTCHA_APIKEY').strip()
+	cookie = os.environ.get('ONEPOINT3ACRES_COOKIE', '').strip()
+	TwoCaptcha_apikey = os.environ.get('TWOCAPTCHA_APIKEY', '').strip()
 	
 	try:
 		if not cookie:
