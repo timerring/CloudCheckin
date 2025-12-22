@@ -41,7 +41,7 @@ for idx, cookie in enumerate(cookie_list):
     try:
         # random=true means get a random bonus
         url = 'https://www.nodeseek.com/api/attendance?random=true'
-        response = requests.post(url, headers=headers, impersonate="chrome124")
+        response = requests.post(url, headers=headers, impersonate="chrome136")
         
         # Output the status code and response content
         print(f"The {idx+1} account's Status Code: {response.status_code}", flush=True)
