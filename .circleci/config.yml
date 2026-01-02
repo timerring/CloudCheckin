@@ -46,6 +46,21 @@ jobs:
           command: |
             python -m onepoint3acres.onepoint3acres
 
+  deepflood:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            python -m pip install --upgrade pip
+            pip install curl_cffi python-dotenv
+      - run:
+          name: Run Deepflood signin
+          command: |
+            python -m deepflood.deepflood
+
 workflows:
   # Allow manual triggers
   manual_trigger:
@@ -55,4 +70,6 @@ workflows:
       - v2ex:
           context: checkincontext
       - onepoint3acres:
+          context: checkincontext
+      - deepflood:
           context: checkincontext
