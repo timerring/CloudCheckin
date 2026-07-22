@@ -206,5 +206,5 @@ python -m natfrp.natfrp
 - [1point3acres](https://github.com/harryhare/1point3acres)
 - [V2EX](https://github.com/CruiseTian/action-hub)
 - [nodeseek](https://github.com/xinycai/nodeseek_signin)
-- [XavierJiezou/SakuraFRP-Daily-Checkin](https://github.com/XavierJiezou/SakuraFRP-Daily-Checkin)
-- [Solve.md](https://github.com/lyon-le/sakurafrp-auto-sign/blob/main/Solve.md)
+- [SakuraFRP](https://github.com/XavierJiezou/SakuraFRP-Daily-Checkin)
+- [SakuraFRP HTTP protocol](https://github.com/lyon-le/sakurafrp-auto-sign/blob/main/Solve.md)
