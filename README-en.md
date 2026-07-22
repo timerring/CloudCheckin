@@ -25,7 +25,6 @@ Automatically complete platform tasks daily. After completion, notifications wil
   - Automatic quiz completion
 - **SakuraFrp**
   - Opens check-in and detects the result automatically
-  - Requires the user to complete GeeTest in a visible browser
 
 ## Architecture
 
