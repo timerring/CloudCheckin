@@ -2,3 +2,6 @@ requests
 2captcha-python
 curl_cffi
 python-dotenv
+playwright
+openai
+Pillow

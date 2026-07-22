@@ -23,6 +23,9 @@ Automatically complete platform tasks daily. After completion, notifications wil
 - **1Point3Acres**
   - Automatic check-in
   - Automatic quiz completion
+- **SakuraFrp**
+  - Opens check-in and detects the result automatically
+  - Requires the user to complete GeeTest in a visible browser
 
 ## Architecture
 
@@ -102,6 +105,18 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 
 </details>
 
+<details>
+<summary>Configure SakuraFrp check-in (AI-powered captcha solving)</summary>
+
+1. Get the Cookie from the SakuraFrp user page and set it as `NATFRP_COOKIE` in your local `.env`.
+2. Install Chromium with `playwright install chromium`.
+3. Register on [MiMo Open Platform](https://platform.xiaomimimo.com/), get an API Key (`sk-xxxxx`), and set it as `NATFRP_MIMO_APIKEY`.
+   - MiMo `mimo-v2.5` is pay-per-use (¥1/M input tokens + ¥2/M output tokens). Each check-in consumes ~6000 tokens, costing approximately **¥0.01**.
+4. Set `NATFRP_HEADLESS=true`. The script opens a browser, clicks check-in, and the AI automatically recognizes and solves the GeeTest 9-grid captcha.
+5. Set `NATFRP_NOTIFY=true` if you want Telegram result notifications. It is off by default.
+6. Run `python -m natfrp.natfrp`.
+</details>
+
 #### Sync Configuration
 
 After configuring all content, please manually execute the `Setup CircleCI Context and Secrets` and `Deploy Cloudflare Worker` workflows once to ensure that configuration secrets are correctly synchronized to CircleCI contexts secrets through CircleCI CLI, and that the Cloudflare Worker is properly deployed. (Actions -> `Setup CircleCI Context and Secrets` -> `Run workflow` and Actions -> `Deploy Cloudflare Worker` -> `Run workflow`)
@@ -111,6 +126,7 @@ After configuring all content, please manually execute the `Setup CircleCI Conte
 ```bash
 # Install dependencies
 pip install -r requirements.txt
+playwright install chromium
 
 # Copy env template and fill in your config
 cp .env.localtest.example .env
@@ -119,6 +135,7 @@ cp .env.localtest.example .env
 python -m nodeseek.nodeseek
 python -m v2ex.v2ex
 python -m onepoint3acres.onepoint3acres
+python -m natfrp.natfrp
 ```
 
 ## FAQ
@@ -147,3 +164,5 @@ Welcome to submit platforms you need, no language restrictions.
 - [1point3acres](https://github.com/harryhare/1point3acres)
 - [V2EX](https://github.com/CruiseTian/action-hub)
 - [nodeseek](https://github.com/xinycai/nodeseek_signin)
+- [XavierJiezou/SakuraFRP-Daily-Checkin](https://github.com/XavierJiezou/SakuraFRP-Daily-Checkin)
+- [Solve.md](https://github.com/lyon-le/sakurafrp-auto-sign/blob/main/Solve.md)

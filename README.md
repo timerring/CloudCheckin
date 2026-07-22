@@ -25,6 +25,9 @@
 - **一亩三分地**
   - 自动签到
   - 自动答题
+- **SakuraFrp**
+  - 自动打开签到并检测结果
+  - GeeTest 验证码由用户在可见浏览器中人工完成
 
 ## 架构及时序图
 
@@ -144,6 +147,18 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 4. 将 `api key` 添加到仓库密钥中，命名为 `TWOCAPTCHA_APIKEY`
 </details>
 
+<details>
+<summary>配置 SakuraFrp 签到（AI 自动识别验证码）</summary>
+
+1. 从 SakuraFrp 用户页面获取 Cookie，并在本地 `.env` 中配置为 `NATFRP_COOKIE`。
+2. 安装 Chromium：`playwright install chromium`。
+3. 注册 [MiMo 开放平台](https://platform.xiaomimimo.com/)，获取 API Key（格式 `sk-xxxxx`），配置为 `NATFRP_MIMO_APIKEY`。
+   - MiMo `mimo-v2.5` 模型按量计费（¥1/百万输入 token + ¥2/百万输出 token），每次签到约消耗 6000 token，约 **¥0.01**。
+4. 保持 `NATFRP_HEADLESS=true`。脚本会自动打开浏览器点击签到，AI 识别 GeeTest 九宫格验证码并自动完成。
+5. 如需发送 Telegram 结果通知，设置 `NATFRP_NOTIFY=true`；默认关闭。
+6. 运行 `python -m natfrp.natfrp`。
+</details>
+
 #### 同步配置
 
 配置完成所有内容后，请手动执行一次 `Setup CircleCI Context and Secrets` 以及 `Deploy Cloudflare Worker` workflow 确保配置 secrets 通过 CircleCI CLI 正确同步至 CircleCI contexts secrets，并将 Cloudflare Worker 正确部署。（Actions -> `Setup CircleCI Context and Secrets` -> `Run workflow` 以及 Actions -> `Deploy Cloudflare Worker` -> `Run workflow`）
@@ -156,6 +171,7 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 ```bash
 # 安装依赖
 pip install -r requirements.txt
+playwright install chromium
 
 # 复制环境变量模板并填入你的配置
 cp .env.localtest.example .env
@@ -165,6 +181,7 @@ python -m nodeseek.nodeseek
 python -m deepflood.deepflood
 python -m v2ex.v2ex
 python -m onepoint3acres.onepoint3acres
+python -m natfrp.natfrp
 ```
 
 ## 常见问题
@@ -192,3 +209,5 @@ python -m onepoint3acres.onepoint3acres
 - [1point3acres](https://github.com/harryhare/1point3acres)
 - [V2EX](https://github.com/CruiseTian/action-hub)
 - [nodeseek](https://github.com/xinycai/nodeseek_signin)
+- [XavierJiezou/SakuraFRP-Daily-Checkin](https://github.com/XavierJiezou/SakuraFRP-Daily-Checkin)
+- [Solve.md](https://github.com/lyon-le/sakurafrp-auto-sign/blob/main/Solve.md)
