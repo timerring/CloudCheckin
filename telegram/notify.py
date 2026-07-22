@@ -3,6 +3,7 @@ import urllib.parse
 import json
 import os
 import sys
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,6 +13,31 @@ TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN', '').strip()
 # add the bot to your contact and send a message to it
 # then check the url https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates to get the chat id
 TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '').strip()
+
+BEIJING_TIMEZONE = timezone(timedelta(hours=8))
+
+
+def format_source_notification(source, messages, now=None):
+    """Format one compact Telegram notification for a platform run."""
+    if isinstance(messages, str):
+        messages = [messages]
+
+    body = "\n".join(
+        str(message).strip()
+        for message in messages
+        if message is not None and str(message).strip()
+    )
+    if not body:
+        body = "No result was reported."
+
+    timestamp = now or datetime.now(BEIJING_TIMEZONE)
+    return f"{timestamp.strftime('%Y/%m/%d %H:%M:%S')}\n{source.upper()}\n{body}"
+
+
+def send_source_notification(source, messages):
+    """Send exactly one formatted notification for a platform run."""
+    send_tg_notification(format_source_notification(source, messages))
+
 
 def send_tg_notification(message):
     """Send Telegram notification
@@ -61,4 +87,4 @@ def send_tg_notification(message):
         conn.close()
 
 if __name__ == "__main__":
-    send_tg_notification("Action test")
+    send_source_notification("TELEGRAM", "Action test")
