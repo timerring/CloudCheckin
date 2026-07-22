@@ -8,7 +8,7 @@ import http.cookies
 import time
 from dotenv import load_dotenv
 from .questions import questions
-from telegram.notify import send_tg_notification
+from telegram.notify import send_source_notification
 
 load_dotenv()
 
@@ -24,6 +24,7 @@ class OnePointThreeAcres:
 		self.post_answer_url = "https://api.1point3acres.com/api/daily_questions"
 		self.cookie = cookie
 		self.solver = solver
+		self.messages = []
 		self.session = requests.session()
 		self.session.cookies.update(http.cookies.SimpleCookie(self.cookie))
 		self.header = {
@@ -57,11 +58,11 @@ class OnePointThreeAcres:
 		# }
 		if response.status_code != 200:
 			print(response.text)
+			self.messages.append(f"Check-in failed: {response.text}")
 			return False
 		else:
 			resp_json = json.loads(response.text)
-			# print(resp_json["msg"])
-			send_tg_notification(resp_json["msg"])
+			self.messages.append(resp_json["msg"])
 			return True
 
 	def get_daily_task_answer(self) -> tuple[int, int]:
@@ -89,15 +90,13 @@ class OnePointThreeAcres:
 		question_id = resp_json["question"]["id"]
 		question = resp_json["question"]["qc"]
 		question = question.strip()
-		# print(f"The question of 1point3acres is: {question}")
-		send_tg_notification(f"The question of 1point3acres is: {question}")
+		print(f"The question of 1point3acres is: {question}")
 		answers = {}
 		answers[1] = resp_json["question"]["a1"]
 		answers[2] = resp_json["question"]["a2"]
 		answers[3] = resp_json["question"]["a3"]
 		answers[4] = resp_json["question"]["a4"]
-		# print(f"The options of 1point3acres are: {answers}")
-		send_tg_notification(f"The options of 1point3acres are: {answers}")
+		print(f"The options of 1point3acres are: {answers}")
 		answer = ""
 		answer_id = 0
 		if question in questions.keys():
@@ -110,10 +109,10 @@ class OnePointThreeAcres:
 				print(f"The question: {question}")
 				print(f"answer not found: {answer}")
 				print("欢迎提交 PR 更新问题到 question.py https://github.com/timerring/daily-actions")
-				send_tg_notification(f"answer not found: {answer}, 欢迎提交 PR 更新问题到 https://github.com/timerring/daily-actions")
+				self.messages.append(f"Answer not found: {answer}")
 		else:
 			print("question not found")
-			send_tg_notification("question not found")
+			self.messages.append("Daily question not found")
 			return None, None
 		return question_id, answer_id
 
@@ -191,7 +190,7 @@ class OnePointThreeAcres:
 		# }
 		if "人机验证出错，请重试" in response.text:
 			print("The captcha is wrong")
-			send_tg_notification("The captcha is wrong")
+			self.messages.append("Answer failed: CAPTCHA verification error")
 			self.solver.report(captcha_id, False)
 			return False
 		else:
@@ -199,21 +198,22 @@ class OnePointThreeAcres:
 
 		result = json.loads(response.text)
 		print(result["msg"])
-		send_tg_notification(result["msg"])
+		self.messages.append(result["msg"])
 		if (result["errno"] == 0):
 			return True
 		elif (result["msg"] == "您今天已经答过题了"):
-			send_tg_notification("You have already answered the question today")
 			return True
 		else:
 			print(response.text)
-			send_tg_notification(response.text)
 			return False
 
 
 if __name__ == "__main__":
 	cookie = os.environ.get('ONEPOINT3ACRES_COOKIE', '').strip()
 	TwoCaptcha_apikey = os.environ.get('TWOCAPTCHA_APIKEY', '').strip()
+	messages = []
+	exit_code = 0
+	acres = None
 	
 	try:
 		if not cookie:
@@ -229,7 +229,7 @@ if __name__ == "__main__":
 		# daily checkin
 		daily_checkin_status = acres.daily_checkin()
 		if not daily_checkin_status:
-			send_tg_notification("Fail to check in the 1point3acres")
+			raise ValueError("Fail to check in the 1point3acres")
 		# daily question
 		question_id, answer_id = acres.get_daily_task_answer()
 		if not question_id or not answer_id:
@@ -241,8 +241,14 @@ if __name__ == "__main__":
 		
 	except Exception as err:
 		print(err, flush=True)
-		sys.exit(1)
+		messages.append(f"Error: {err}")
+		exit_code = 1
+	finally:
+		if acres:
+			messages = acres.messages + messages
+		send_source_notification("1POINT3ACRES", messages)
 
+	sys.exit(exit_code)
 
 
 

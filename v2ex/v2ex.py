@@ -1,17 +1,14 @@
 from curl_cffi import requests
 import re
 import os
-from datetime import datetime, timedelta
 import sys
 from dotenv import load_dotenv
-from telegram.notify import send_tg_notification
+from telegram.notify import send_source_notification
 
 load_dotenv()
 
 cookie = os.environ.get('V2EX_COOKIE', '').strip()
-# Initial the message time
-time = datetime.now() + timedelta(hours=8)
-message = time.strftime("%Y/%m/%d %H:%M:%S") + " from V2EX \n"
+message = ""
 headers = {
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
     "accept-language": "en-US,en;q=0.9",
@@ -43,7 +40,7 @@ def get_once() -> tuple[str, bool]:
     
     reg1 = r"需要先登录"
     if re.search(reg1, content):
-        message += "The cookie is overdated."
+        message += "The cookie is expired.\n"
         return None, False
     else:
         reg = r"每日登录奖励已领取"
@@ -55,7 +52,7 @@ def get_once() -> tuple[str, bool]:
             once_match = re.search(reg, content)
             if once_match:
                 once = once_match.group(1)
-                message += f"Successfully get once {once}\n"
+                message += "Check-in token acquired.\n"
                 return once, False
             else:
                 message += "Have not signed, but fail to get once\n"
@@ -78,7 +75,6 @@ def check_in(once: str) -> bool:
     reg = r"已成功领取每日登录奖励"
     if re.search(reg, content):
         message += "Check in successfully\n"
-        send_tg_notification(message)
         return True
     else:
         message += "Fail to check in\n"
@@ -107,6 +103,7 @@ def balance() -> tuple[str, str]:
         
 
 if __name__ == "__main__":
+    exit_code = 0
     try:
         if not cookie:
             raise ValueError("Environment variable V2EX_COOKIE is not set")
@@ -115,17 +112,25 @@ if __name__ == "__main__":
         once, signed = get_once()
 
         # check in
-        if once and not signed:
+        if signed:
+            reward_time, current_balance = balance()
+            if reward_time and current_balance:
+                message += f"Latest reward: {reward_time}\nBalance: {current_balance}\n"
+        elif once:
             success = check_in(once)
             if not success:
                 raise ValueError("Fail to check in")
-            time, balance = balance()
-            if not time or not balance:
+            reward_time, current_balance = balance()
+            if not reward_time or not current_balance:
                 raise ValueError("Fail to get balance")
+            message += f"Latest reward: {reward_time}\nBalance: {current_balance}\n"
         else:
-            message += "FAIL.\n"
-            send_tg_notification(message)
             raise ValueError("Fail to check in")
     except Exception as err:
         print(err, flush=True)
-        sys.exit(1)
+        message += f"Error: {err}\n"
+        exit_code = 1
+    finally:
+        send_source_notification("V2EX", message)
+
+    sys.exit(exit_code)
