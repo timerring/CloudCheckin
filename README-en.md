@@ -129,7 +129,7 @@ python -m onepoint3acres.onepoint3acres
 
 2. **Why not use Cloudflare Worker or other Serverless computing functions?**
    
-   We have tried Cloudflare Worker. Local `wrangler dev` works, but after deploying to Cloudflare Worker, since Cloudflare edge requests carry obvious cf flags, many platforms have restricted Cloudflare Worker requests. We are still trying more function computing platforms, and any progress will be synchronized in the repository. Of course, if you are interested in the Cloudflare Worker approach, you are welcome to continue the work. The demo I debugged locally has been placed in the `cloudflareworkers` directory.
+   We have tried Cloudflare Worker. Local `wrangler dev` works, but after deploying to Cloudflare Worker, since Cloudflare edge requests carry obvious cf flags, many platforms have restricted Cloudflare Worker requests.
 
 3. **Why switch to Cloudflare Worker as a Webhook trigger instead of using CircleCI's Scheduled?**
    
