@@ -150,13 +150,11 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 <details>
 <summary>配置 SakuraFrp 签到（AI 自动识别验证码）</summary>
 
-1. 从 SakuraFrp 用户页面获取 Cookie，并在本地 `.env` 中配置为 `NATFRP_COOKIE`。
-2. 安装 Chromium：`playwright install chromium`。
-3. 注册 [MiMo 开放平台](https://platform.xiaomimimo.com/)，获取 API Key（格式 `sk-xxxxx`），配置为 `NATFRP_MIMO_APIKEY`。
+1. 从 SakuraFrp 用户页面获取 `cookie`（获取方法请参考 [COOKIE 获取教程](https://blog.timerring.com/posts/the-way-to-get-cookie/)）
+2. 将 `cookie` 添加到仓库密钥中，命名为 `NATFRP_COOKIE`
+3. 从 [MiMo 开放平台](https://platform.xiaomimimo.com/) 获取 `api key`（由于 SakuraFrp 签到需要通过 GeeTest 九宫格验证码，因此这里使用 MiMo 视觉模型识别验证码）
    - MiMo `mimo-v2.5` 模型按量计费（¥1/百万输入 token + ¥2/百万输出 token），每次签到约消耗 6000 token，约 **¥0.01**。
-4. 保持 `NATFRP_HEADLESS=true`。脚本会自动打开浏览器点击签到，AI 识别 GeeTest 九宫格验证码并自动完成。
-5. 如需发送 Telegram 结果通知，设置 `NATFRP_NOTIFY=true`；默认关闭。
-6. 运行 `python -m natfrp.natfrp`。
+4. 将 `api key` 添加到仓库密钥中，命名为 `NATFRP_MIMO_APIKEY`
 </details>
 
 #### 同步配置

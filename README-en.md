@@ -108,13 +108,11 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 <details>
 <summary>Configure SakuraFrp check-in (AI-powered captcha solving)</summary>
 
-1. Get the Cookie from the SakuraFrp user page and set it as `NATFRP_COOKIE` in your local `.env`.
-2. Install Chromium with `playwright install chromium`.
-3. Register on [MiMo Open Platform](https://platform.xiaomimimo.com/), get an API Key (`sk-xxxxx`), and set it as `NATFRP_MIMO_APIKEY`.
+1. Get the `cookie` from the SakuraFrp user page (see the [COOKIE acquisition tutorial](https://blog.timerring.com/posts/the-way-to-get-cookie/)).
+2. Add the `cookie` to the repository secrets with the name `NATFRP_COOKIE`.
+3. Get an `api key` from the [MiMo Open Platform](https://platform.xiaomimimo.com/) (SakuraFrp check-in requires a GeeTest 9-grid captcha, so the MiMo vision model is used to recognize it).
    - MiMo `mimo-v2.5` is pay-per-use (¥1/M input tokens + ¥2/M output tokens). Each check-in consumes ~6000 tokens, costing approximately **¥0.01**.
-4. Set `NATFRP_HEADLESS=true`. The script opens a browser, clicks check-in, and the AI automatically recognizes and solves the GeeTest 9-grid captcha.
-5. Set `NATFRP_NOTIFY=true` if you want Telegram result notifications. It is off by default.
-6. Run `python -m natfrp.natfrp`.
+4. Add the `api key` to the repository secrets with the name `NATFRP_MIMO_APIKEY`.
 </details>
 
 #### Sync Configuration

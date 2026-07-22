@@ -19,6 +19,7 @@ SIGN_BUTTON_TEXT = "点击这里签到"
 GRID_SELECTOR = ".geetest_table_box"
 ADULT_CHECK_SELECTOR = ".adult-check"
 ADULT_CONFIRM_TEXT = "是，我已满18岁"
+CAPTCHA_TIMEOUT_SECONDS = 180
 
 
 class NatfrpError(RuntimeError):
@@ -32,8 +33,6 @@ class ManualCaptchaRequired(NatfrpError):
 @dataclass(frozen=True)
 class NatfrpConfig:
     cookie: str = ""
-    headless: bool = True
-    captcha_timeout_seconds: int = 180
     mimo_apikey: str = ""
 
     @classmethod
@@ -42,24 +41,10 @@ class NatfrpConfig:
         if not cookie:
             raise NatfrpError("Environment variable NATFRP_COOKIE is not set")
 
-        headless = os.environ.get("NATFRP_HEADLESS", "true").strip().lower() in {
-            "1", "true", "yes", "on",
-        }
-
-        timeout_value = os.environ.get("NATFRP_CAPTCHA_TIMEOUT_SECONDS", "180").strip()
-        try:
-            timeout = int(timeout_value)
-        except ValueError as exc:
-            raise NatfrpError("NATFRP_CAPTCHA_TIMEOUT_SECONDS must be an integer") from exc
-        if timeout <= 0:
-            raise NatfrpError("NATFRP_CAPTCHA_TIMEOUT_SECONDS must be positive")
-
         mimo_apikey = os.environ.get("NATFRP_MIMO_APIKEY", "").strip()
 
         return cls(
             cookie=cookie,
-            headless=headless,
-            captcha_timeout_seconds=timeout,
             mimo_apikey=mimo_apikey,
         )
 
@@ -255,7 +240,7 @@ def check_in(config: NatfrpConfig) -> bool:
         ) from exc
 
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=config.headless)
+        browser = playwright.chromium.launch(headless=True)
         try:
             context = browser.new_context()
             page = context.new_page()
@@ -318,7 +303,7 @@ def check_in(config: NatfrpConfig) -> bool:
             page.wait_for_timeout(1_000)
 
             # Wait for result (captcha solve loop)
-            deadline = time.monotonic() + config.captcha_timeout_seconds
+            deadline = time.monotonic() + CAPTCHA_TIMEOUT_SECONDS
             last_captcha_attempt = 0.0
             captcha_failures = 0
 
@@ -350,22 +335,16 @@ def check_in(config: NatfrpConfig) -> bool:
                         page.wait_for_timeout(1500)
                         continue
 
-                    if config.headless:
-                        raise ManualCaptchaRequired(
-                            "SakuraFrp requested GeeTest verification; rerun with "
-                            "NATFRP_HEADLESS=false and complete it in the visible browser"
-                        )
-                    print(
-                        "GeeTest verification is waiting in the browser. "
-                        "Please complete it manually.",
-                        flush=True,
+                    raise ManualCaptchaRequired(
+                        "SakuraFrp requested GeeTest verification but the AI captcha "
+                        "solver is unavailable or could not solve it"
                     )
 
                 page.wait_for_timeout(500)
 
             raise NatfrpError(
                 f"SakuraFrp check-in did not complete within "
-                f"{config.captcha_timeout_seconds} seconds"
+                f"{CAPTCHA_TIMEOUT_SECONDS} seconds"
             )
         finally:
             browser.close()
@@ -377,7 +356,7 @@ def check_in(config: NatfrpConfig) -> bool:
 
 
 def _notify_if_configured(message: str) -> None:
-    enabled = os.environ.get("NATFRP_NOTIFY", "false").strip().lower() in {
+    enabled = os.environ.get("NATFRP_NOTIFY", "true").strip().lower() in {
         "1", "true", "yes", "on",
     }
     if (
