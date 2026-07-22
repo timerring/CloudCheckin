@@ -61,6 +61,22 @@ jobs:
           command: |
             python -m deepflood.deepflood
 
+  natfrp:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            python -m pip install --upgrade pip
+            pip install python-dotenv playwright openai Pillow
+            playwright install --with-deps chromium
+      - run:
+          name: Run SakuraFrp signin
+          command: |
+            python -m natfrp.natfrp
+
 workflows:
   # Allow manual triggers
   manual_trigger:
@@ -72,4 +88,6 @@ workflows:
       - onepoint3acres:
           context: checkincontext
       - deepflood:
+          context: checkincontext
+      - natfrp:
           context: checkincontext
