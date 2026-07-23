@@ -12,6 +12,9 @@ from telegram.notify import send_source_notification
 
 load_dotenv()
 
+# 2Captcha 验证失败时最多重试次数（含首次，默认 3 次）
+MAX_CAPTCHA_RETRIES = 3
+
 class OnePointThreeAcres:
 	def __init__(self, cookie: str, solver: TwoCaptcha):
 		self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
@@ -33,37 +36,53 @@ class OnePointThreeAcres:
 			"Referer": "https://www.1point3acres.com/"
 		}
 
-	def daily_checkin(self):
-		result = self.solver.turnstile(sitekey=self.cf_capcha_site_key, url=self.checkin_page, useragent=self.user_agent)
-		# print(result)
-		code = result["code"]
-		# Restriction: 您的今日想说内容少于6个字母或3个中文字，请修改后再次提交！
-		emoji_list = ['kx', 'ng', 'ym', 'wl', 'nu', 'ch', 'fd', 'yl', 'shuai']
-		body = {
-			"qdxq": random.choice(emoji_list),
-			"todaysay": "没有太多想说的",
-			"captcha_response": code,
-			"hashkey": "",
-			"version": 2
-		}
+	def _solve_turnstile(self, page_url: str) -> dict:
+		"""Solve a Cloudflare Turnstile captcha, returning the result dict."""
+		return self.solver.turnstile(
+			sitekey=self.cf_capcha_site_key,
+			url=page_url,
+			useragent=self.user_agent,
+		)
 
-		response = self.session.post(self.post_checkin_url, headers=self.header, data=json.dumps(body))
-		# {
-		#   "checkin-info": "签到成功",
-		#   "errno": 0,
-		#   "msg": "恭喜你签到成功!获得奖励 大米 1 升",
-		#   "user": {
-		#   # Some user info, the same as the answer_daily_question response
-		#   }
-		# }
-		if response.status_code != 200:
-			print(response.text)
-			self.messages.append(f"Check-in failed: {response.text}")
-			return False
-		else:
+	def _is_captcha_error(self, response_text: str) -> bool:
+		"""Check whether a 1point3acres API response indicates a captcha failure."""
+		return "人机验证出错" in response_text
+
+	def daily_checkin(self) -> bool:
+		for attempt in range(1, MAX_CAPTCHA_RETRIES + 1):
+			if attempt > 1:
+				sleeptime = random.uniform(3, 8)
+				print(f"  [Retry] checkin attempt {attempt}/{MAX_CAPTCHA_RETRIES} (sleep {sleeptime:.1f}s)", flush=True)
+				time.sleep(sleeptime)
+
+			result = self._solve_turnstile(self.checkin_page)
+			code = result["code"]
+			# Restriction: 您的今日想说内容少于6个字母或3个中文字，请修改后再次提交！
+			emoji_list = ['kx', 'ng', 'ym', 'wl', 'nu', 'ch', 'fd', 'yl', 'shuai']
+			body = {
+				"qdxq": random.choice(emoji_list),
+				"todaysay": "没有太多想说的",
+				"captcha_response": code,
+				"hashkey": "",
+				"version": 2
+			}
+
+			response = self.session.post(self.post_checkin_url, headers=self.header, data=json.dumps(body))
+			if response.status_code != 200:
+				print(response.text, flush=True)
+				continue
+
 			resp_json = json.loads(response.text)
-			self.messages.append(resp_json["msg"])
+			if self._is_captcha_error(response.text):
+				print(f"  Checkin captcha error (attempt {attempt}): {resp_json.get('msg')}", flush=True)
+				continue
+
+			self.messages.append(resp_json.get("msg", ""))
 			return True
+
+		print("Check-in failed after all retries", flush=True)
+		self.messages.append("Check-in failed: captcha verification error after retries")
+		return False
 
 	def get_daily_task_answer(self) -> tuple[int, int]:
 
@@ -117,95 +136,47 @@ class OnePointThreeAcres:
 		return question_id, answer_id
 
 	def answer_daily_question(self, question: int, answer: int) -> bool:
-		result = self.solver.turnstile(sitekey=self.cf_capcha_site_key, url=self.question_page, useragent=self.user_agent)
-		# print(result)
-		code = result["code"]
-		captcha_id = result["captchaId"]
+		for attempt in range(1, MAX_CAPTCHA_RETRIES + 1):
+			if attempt > 1:
+				sleeptime = random.uniform(3, 8)
+				print(f"  [Retry] answer attempt {attempt}/{MAX_CAPTCHA_RETRIES} (sleep {sleeptime:.1f}s)", flush=True)
+				time.sleep(sleeptime)
 
-		# request body example:
-		# {
-		# 	"qid": 9,
-		# 	"answer": 4,
-		# 	"captcha_response": "0sP469",
-		# 	"hashkey": "",
-		# 	"version": 2
-		# }
+			result = self._solve_turnstile(self.question_page)
+			code = result["code"]
+			captcha_id = result["captchaId"]
 
-		body = {
-			"qid": question,
-			"answer": answer,
-			"captcha_response": code,
-			"hashkey": "",
-			"version": 2
-		}
+			body = {
+				"qid": question,
+				"answer": answer,
+				"captcha_response": code,
+				"hashkey": "",
+				"version": 2
+			}
 
-		response = self.session.post(self.post_answer_url, headers=self.header, data=json.dumps(body))
-		# print(response.status_code)
-		# print(response.text)
-		# example response:
-		# {
-		#   "answer-info": "答题成功",
-		#   "errno": 0,
-		#   "msg": "恭喜你答题成功!获得奖励 大米 1 升",
-		#   "user": {
-		#     "adexpiry": 0, # ad-free subscription
-		#     "adminid": 0, # administrative level or permissions
-		#     "app_status": {
-		#       "checkin": true,
-		#       "question": true
-		#     },
-		#     "avatarstatus": 2,
-		#     "blocked_uids": [], # your block account
-		#     "credits": yourtotoalcredits(int),
-		#     "emailstatus": 0,
-		#     "extgroupids": "",
-		#     "groupexpiry": 0,
-		#     "groupid": your_user_group_id(int),
-		#     "is_bind_wechat": 1,
-		#     "magics": [],
-		#     "majias": [], # majia
-		#     "newpm": 0,
-		#     "newprompt": 0,
-		#     "phone_verified": 0,
-		#     "regdate": your_register_date(Unixstamp, int),
-		#     "uid": your_uid(int),
-		#     "user_count": { # user info count
-		#       "extcredits1": int,
-		#       "extcredits2": int,
-		#       "extcredits3": int,
-		#       "extcredits4": int,
-		#       "extcredits5": int,
-		#       "extcredits6": int,
-		#       "extcredits7": int,
-		#       "extcredits8": int,
-		#       "follower": int,
-		#       "following": int,
-		#       "posts": int,
-		#       "threads": int
-		#     },
-		#     "username": "your_username(str)",
-		#     "v_domains": [],
-		#     "videophotostatus": 0
-		#   }
-		# }
-		if "人机验证出错，请重试" in response.text:
-			print("The captcha is wrong")
-			self.messages.append("Answer failed: CAPTCHA verification error")
-			self.solver.report(captcha_id, False)
-			return False
-		else:
+			response = self.session.post(self.post_answer_url, headers=self.header, data=json.dumps(body))
+
+			if self._is_captcha_error(response.text):
+				print(f"  Answer captcha error (attempt {attempt})", flush=True)
+				self.solver.report(captcha_id, False)
+				continue
+
 			self.solver.report(captcha_id, True)
 
-		result = json.loads(response.text)
-		print(result["msg"])
-		self.messages.append(result["msg"])
-		if (result["errno"] == 0):
-			return True
-		elif (result["msg"] == "您今天已经答过题了"):
-			return True
-		else:
-			print(response.text)
-			return False
+			resp_json = json.loads(response.text)
+			print(resp_json.get("msg", ""), flush=True)
+			self.messages.append(resp_json.get("msg", ""))
+			if resp_json.get("errno") == 0:
+				return True
+			elif resp_json.get("msg") == "您今天已经答过题了":
+				return True
+			else:
+				print(response.text, flush=True)
+				continue
+
+		print("Answer failed after all retries", flush=True)
+		self.messages.append("Answer failed: CAPTCHA verification error after retries")
+		return False
 
 
 if __name__ == "__main__":
