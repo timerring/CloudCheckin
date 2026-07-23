@@ -26,7 +26,7 @@
   - 自动签到
   - 自动答题
 - **SakuraFrp**
-  - 自动打开签到并检测结果
+  - 自动登录并签到（纯 HTTP 协议解决 GeeTest v3 + MiMo AI 识别验证码）
 
 ## 架构及时序图
 
@@ -147,13 +147,15 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 </details>
 
 <details>
-<summary>配置 SakuraFrp 签到（AI 自动识别验证码）</summary>
+<summary>配置 SakuraFrp 签到（纯 HTTP + AI 识别验证码）</summary>
 
-1. 从 SakuraFrp 用户页面获取 `cookie`（获取方法请参考 [COOKIE 获取教程](https://blog.timerring.com/posts/the-way-to-get-cookie/)）
-2. 将 `cookie` 添加到仓库密钥中，命名为 `NATFRP_COOKIE`
+1. 注册 [SakuraFrp](https://www.natfrp.com/) 账号，获取登录用户名和密码
+2. 将用户名和密码添加到仓库密钥中，命名为 `SAKURAFRP_USERNAME` 和 `SAKURAFRP_PASSWORD`
 3. 从 [MiMo 开放平台](https://platform.xiaomimimo.com/) 获取 `api key`（由于 SakuraFrp 签到需要通过 GeeTest 九宫格验证码，因此这里使用 MiMo 视觉模型识别验证码）
    - MiMo `mimo-v2.5` 模型按量计费（¥1/百万输入 token + ¥2/百万输出 token），每次签到约消耗 6000 token，约 **¥0.01**。
-4. 将 `api key` 添加到仓库密钥中，命名为 `NATFRP_MIMO_APIKEY`
+4. 将 `api key` 添加到仓库密钥中，命名为 `SAKURAFRP_MIMO_APIKEY`
+
+> 采用纯 HTTP 协议解决 GeeTest v3 验证码（AES-CBC + RSA 加密），无需 Playwright/浏览器，每次签到仅需 2-3 秒。
 </details>
 
 #### 同步配置
@@ -161,14 +163,13 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 配置完成所有内容后，请手动执行一次 `Setup CircleCI Context and Secrets` 以及 `Deploy Cloudflare Worker` workflow 确保配置 secrets 通过 CircleCI CLI 正确同步至 CircleCI contexts secrets，并将 Cloudflare Worker 正确部署。（Actions -> `Setup CircleCI Context and Secrets` -> `Run workflow` 以及 Actions -> `Deploy Cloudflare Worker` -> `Run workflow`）
 
 > [!IMPORTANT]
-> 有时 cookie 会过期导致签到失败，如果遇到失败情况，请考虑重新获取 cookie 填入 Secrets，再手动执行 `Setup CircleCI Context and Secrets` workflow 同步 cookie 到 CircleCI。
+> Cookie 或登录凭据失效会导致签到失败。请更新对应平台的仓库 Secrets，再手动执行 `Setup CircleCI Context and Secrets` workflow 将配置同步到 CircleCI。
 
 ## 本地调试
 
 ```bash
 # 安装依赖
 pip install -r requirements.txt
-playwright install chromium
 
 # 复制环境变量模板并填入你的配置
 cp .env.localtest.example .env
@@ -178,7 +179,7 @@ python -m nodeseek.nodeseek
 python -m deepflood.deepflood
 python -m v2ex.v2ex
 python -m onepoint3acres.onepoint3acres
-python -m natfrp.natfrp
+python -m sakurafrp.sakurafrp
 ```
 
 ## 常见问题
@@ -206,5 +207,4 @@ python -m natfrp.natfrp
 - [1point3acres](https://github.com/harryhare/1point3acres)
 - [V2EX](https://github.com/CruiseTian/action-hub)
 - [nodeseek](https://github.com/xinycai/nodeseek_signin)
-- [SakuraFRP](https://github.com/XavierJiezou/SakuraFRP-Daily-Checkin)
-- [SakuraFRP HTTP protocol](https://github.com/lyon-le/sakurafrp-auto-sign/blob/main/Solve.md)
+- [SakuraFRP HTTP Protocol (GeeTest v3 solve)](https://github.com/lyon-le/sakurafrp-auto-sign/blob/main/Solve.md)
