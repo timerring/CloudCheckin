@@ -61,7 +61,7 @@ jobs:
           command: |
             python -m deepflood.deepflood
 
-  natfrp:
+  sakurafrp:
     docker:
       - image: cimg/python:3.11
     steps:
@@ -74,7 +74,7 @@ jobs:
       - run:
           name: Run SakuraFrp signin
           command: |
-            python -m natfrp.natfrp
+            python -m sakurafrp.sakurafrp
 
 workflows:
   # Allow manual triggers
@@ -88,5 +88,5 @@ workflows:
           context: checkincontext
       - deepflood:
           context: checkincontext
-      - natfrp:
+      - sakurafrp:
           context: checkincontext

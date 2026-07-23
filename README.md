@@ -179,7 +179,7 @@ python -m nodeseek.nodeseek
 python -m deepflood.deepflood
 python -m v2ex.v2ex
 python -m onepoint3acres.onepoint3acres
-python -m natfrp.natfrp
+python -m sakurafrp.sakurafrp
 ```
 
 ## 常见问题

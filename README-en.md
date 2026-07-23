@@ -133,7 +133,7 @@ cp .env.localtest.example .env
 python -m nodeseek.nodeseek
 python -m v2ex.v2ex
 python -m onepoint3acres.onepoint3acres
-python -m natfrp.natfrp
+python -m sakurafrp.sakurafrp
 ```
 
 ## FAQ
