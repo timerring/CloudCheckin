@@ -24,7 +24,7 @@ Automatically complete platform tasks daily. After completion, notifications wil
   - Automatic check-in
   - Automatic quiz completion
 - **SakuraFrp**
-  - Auto login + check-in (pure HTTP GeeTest v3 solve + MiMo AI captcha recognition)
+  - Automatic login and check-in
 
 ## Architecture
 
@@ -105,7 +105,7 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 </details>
 
 <details>
-<summary>Configure SakuraFrp check-in (pure HTTP + AI captcha recognition)</summary>
+<summary>Configure SakuraFrp check-in</summary>
 
 1. Register a [SakuraFrp](https://www.natfrp.com/) account and get your login username and password.
 2. Add your username and password to the repository secrets with the names `SAKURAFRP_USERNAME` and `SAKURAFRP_PASSWORD`.

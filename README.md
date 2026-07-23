@@ -26,7 +26,7 @@
   - 自动签到
   - 自动答题
 - **SakuraFrp**
-  - 自动登录并签到（纯 HTTP 协议解决 GeeTest v3 + MiMo AI 识别验证码）
+  - 自动登录并签到
 
 ## 架构及时序图
 
@@ -147,7 +147,7 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 </details>
 
 <details>
-<summary>配置 SakuraFrp 签到（纯 HTTP + AI 识别验证码）</summary>
+<summary>配置 SakuraFrp 签到</summary>
 
 1. 注册 [SakuraFrp](https://www.natfrp.com/) 账号，获取登录用户名和密码
 2. 将用户名和密码添加到仓库密钥中，命名为 `SAKURAFRP_USERNAME` 和 `SAKURAFRP_PASSWORD`
