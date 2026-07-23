@@ -186,7 +186,7 @@ python -m sakurafrp.sakurafrp
 
 1. 签到提示 `The cookie is overdated` 或账号登录状态失效怎么办？
 
-   重新获取对应平台的 Cookie，并更新仓库中的 GitHub Actions Secret。然后前往 `Actions`，手动运行一次 `Setup CircleCI Context and Secrets` workflow，将更新后的变量同步到 CircleCI Context。
+   重新获取对应平台的 Cookie，并更新仓库中的 GitHub Actions Secret。然后前往 `Actions`，手动运行一次 `Setup CircleCI Context and Secrets` workflow，这一步会自动将更新后的变量同步到 CircleCI Context，然后所有功能就会恢复正常。
 
 2. 为什么要采用 CircleCI，不直接用 Github Actions？
    
