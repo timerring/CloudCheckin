@@ -70,8 +70,7 @@ jobs:
           name: Install dependencies
           command: |
             python -m pip install --upgrade pip
-            pip install python-dotenv playwright openai Pillow
-            playwright install --with-deps chromium
+            pip install python-dotenv httpx cryptography openai
       - run:
           name: Run SakuraFrp signin
           command: |
