@@ -58,5 +58,6 @@ jobs:
           store_secret "ONEPOINT3ACRES_COOKIE" "${{ secrets.ONEPOINT3ACRES_COOKIE }}"
           store_secret "TWOCAPTCHA_APIKEY" "${{ secrets.TWOCAPTCHA_APIKEY }}"
           store_secret "DEEPFLOOD_COOKIE" "${{ secrets.DEEPFLOOD_COOKIE }}"
-          store_secret "NATFRP_COOKIE" "${{ secrets.NATFRP_COOKIE }}"
+          store_secret "NATFRP_USERNAME" "${{ secrets.NATFRP_USERNAME }}"
+          store_secret "NATFRP_PASSWORD" "${{ secrets.NATFRP_PASSWORD }}"
           store_secret "NATFRP_MIMO_APIKEY" "${{ secrets.NATFRP_MIMO_APIKEY }}"
