@@ -474,6 +474,13 @@ def main() -> int:
         message = f"SakuraFrp check-in failed: {exc}"
         print(message, file=sys.stderr, flush=True)
         _notify_if_configured(message)
+    except Exception as exc:
+        message = (
+            "SakuraFrp check-in failed unexpectedly "
+            f"({type(exc).__name__})"
+        )
+        print(message, file=sys.stderr, flush=True)
+        _notify_if_configured(message)
     return 1
 
 
