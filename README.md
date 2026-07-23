@@ -207,6 +207,4 @@ python -m natfrp.natfrp
 - [1point3acres](https://github.com/harryhare/1point3acres)
 - [V2EX](https://github.com/CruiseTian/action-hub)
 - [nodeseek](https://github.com/xinycai/nodeseek_signin)
-- [SakuraFRP](https://github.com/XavierJiezou/SakuraFRP-Daily-Checkin)
 - [SakuraFRP HTTP Protocol (GeeTest v3 solve)](https://github.com/lyon-le/sakurafrp-auto-sign/blob/main/Solve.md)
-- [SakuraFRP GeeTest implementation](https://github.com/ladeng07/sakura-signin)
