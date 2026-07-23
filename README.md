@@ -184,15 +184,19 @@ python -m sakurafrp.sakurafrp
 
 ## 常见问题
 
-1. 为什么要采用 CircleCI，不直接用 Github Actions？
+1. 签到提示 `The cookie is overdated` 或账号登录状态失效怎么办？
+
+   重新获取对应平台的 Cookie，并更新仓库中的 GitHub Actions Secret。然后前往 `Actions`，手动运行一次 `Setup CircleCI Context and Secrets` workflow，将更新后的变量同步到 CircleCI Context。
+
+2. 为什么要采用 CircleCI，不直接用 Github Actions？
    
    直接用 Github Actions 容易导致潜在的仓库被封风险，尽管本项目一天只触发一次请求不像 upptime 等开源项目有超高的并发请求量，但是本着本分的原则，还是不要给 Github 添加过多负担。CircleCI 同样是优秀的 CI/CD 平台，Free plan 的 30,000 credits/mo, that’s up to 6,000 build mins 完全可以支撑起本项目的所有需求，另外 CircleCI 的不同 Project 间的 contexts 设计思想相较于一般的 CI/CD 有很大程度上的创新，更多用户使用并且熟悉 CircleCI，对于用户以及平台来说都是双方受益的。
 
-2. 为什么不采用 Cloudflare Worker 等 Serverless 函数计算？
+3. 为什么不采用 Cloudflare Worker 等 Serverless 函数计算？
    
    已经尝试过 Cloudflare Worker，本地 wrangler dev 有效，但是 deploy Cloudflare Worker 之后，由于 Cloudflare edge 请求会带有明显的 cf 标志，很多平台已经限制了 Cloudflare Worker 的请求。
 
-3. 为什么要切换到 Cloudflare Worker 作为 Webhook 触发器，不用 CircleCI 的 Scheduled？
+4. 为什么要切换到 Cloudflare Worker 作为 Webhook 触发器，不用 CircleCI 的 Scheduled？
    根据 [CircleCI 的最新条款](https://circleci.com/docs/version-control-system-integration-overview/#pipeline-triggers-and-integrations)，Scheduled pipelines 将不对 `GitHub App` 下的个人仓库开放，因此需要切换到 [Custom Webhook](https://circleci.com/docs/custom-webhooks/) 的形式，通过 Cloudflare Worker 作为定时触发器，当然你也可以采用[其他方式调用 Webhook](https://circleci.com/docs/triggers-overview/#trigger-a-pipeline-from-a-custom-webhook)，只需要定时调用 Webhook 的接口即可，这里我采用了 Cloudflare Worker 作为定时触发器。
 
 ## 贡献

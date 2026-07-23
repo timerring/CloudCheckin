@@ -141,15 +141,19 @@ python -m sakurafrp.sakurafrp
 
 ## FAQ
 
-1. **Why use CircleCI instead of GitHub Actions directly?**
+1. **What should I do when check-in reports `The cookie is overdated` or the account login state has expired?**
+
+   Obtain a fresh Cookie for the affected platform and update its GitHub Actions repository Secret. Then go to `Actions` and manually run the `Setup CircleCI Context and Secrets` workflow once to synchronize the updated variable to the CircleCI Context.
+
+2. **Why use CircleCI instead of GitHub Actions directly?**
    
    Using GitHub Actions directly may lead to potential repository banning risks. Although this project only triggers requests once a day and doesn't have high concurrent request volumes like upptime and other open-source projects, we still follow the principle of not adding excessive burden to GitHub. CircleCI is also an excellent CI/CD platform. The Free plan's 30,000 credits/mo (up to 6,000 build mins) can fully support all the requirements of this project. Additionally, CircleCI's contexts design between different Projects is quite innovative compared to general CI/CD platforms. More users using and becoming familiar with CircleCI benefits both users and the platform.
 
-2. **Why not use Cloudflare Worker or other Serverless computing functions?**
+3. **Why not use Cloudflare Worker or other Serverless computing functions?**
    
    We have tried Cloudflare Worker. Local `wrangler dev` works, but after deploying to Cloudflare Worker, since Cloudflare edge requests carry obvious cf flags, many platforms have restricted Cloudflare Worker requests.
 
-3. **Why switch to Cloudflare Worker as a Webhook trigger instead of using CircleCI's Scheduled?**
+4. **Why switch to Cloudflare Worker as a Webhook trigger instead of using CircleCI's Scheduled?**
    
    According to [CircleCI's latest terms](https://circleci.com/docs/version-control-system-integration-overview/#pipeline-triggers-and-integrations), Scheduled pipelines will not be available for personal repositories under `GitHub App`, so we need to switch to [Custom Webhook](https://circleci.com/docs/custom-webhooks/) format, using Cloudflare Worker as a scheduled trigger. Of course, you can also use [other ways to call Webhook](https://circleci.com/docs/triggers-overview/#trigger-a-pipeline-from-a-custom-webhook), just need to call the Webhook interface regularly. Here I use Cloudflare Worker as the scheduled trigger.
 
