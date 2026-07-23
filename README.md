@@ -150,10 +150,10 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 <summary>配置 SakuraFrp 签到（纯 HTTP + AI 识别验证码）</summary>
 
 1. 注册 [SakuraFrp](https://www.natfrp.com/) 账号，获取登录用户名和密码
-2. 将用户名和密码添加到仓库密钥中，命名为 `NATFRP_USERNAME` 和 `NATFRP_PASSWORD`
+2. 将用户名和密码添加到仓库密钥中，命名为 `SAKURAFRP_USERNAME` 和 `SAKURAFRP_PASSWORD`
 3. 从 [MiMo 开放平台](https://platform.xiaomimimo.com/) 获取 `api key`（由于 SakuraFrp 签到需要通过 GeeTest 九宫格验证码，因此这里使用 MiMo 视觉模型识别验证码）
    - MiMo `mimo-v2.5` 模型按量计费（¥1/百万输入 token + ¥2/百万输出 token），每次签到约消耗 6000 token，约 **¥0.01**。
-4. 将 `api key` 添加到仓库密钥中，命名为 `NATFRP_MIMO_APIKEY`
+4. 将 `api key` 添加到仓库密钥中，命名为 `SAKURAFRP_MIMO_APIKEY`
 
 > 采用纯 HTTP 协议解决 GeeTest v3 验证码（AES-CBC + RSA 加密），无需 Playwright/浏览器，每次签到仅需 2-3 秒。
 </details>

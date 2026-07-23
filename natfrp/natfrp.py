@@ -71,11 +71,11 @@ class NatfrpConfig:
 
     @classmethod
     def from_env(cls) -> "NatfrpConfig":
-        username = os.environ.get("NATFRP_USERNAME", "").strip()
-        password = os.environ.get("NATFRP_PASSWORD", "").strip()
+        username = os.environ.get("SAKURAFRP_USERNAME", "").strip()
+        password = os.environ.get("SAKURAFRP_PASSWORD", "").strip()
         if not username or not password:
-            raise NatfrpError("Set NATFRP_USERNAME + NATFRP_PASSWORD")
-        mimo_apikey = os.environ.get("NATFRP_MIMO_APIKEY", "").strip()
+            raise NatfrpError("Set SAKURAFRP_USERNAME + SAKURAFRP_PASSWORD")
+        mimo_apikey = os.environ.get("SAKURAFRP_MIMO_APIKEY", "").strip()
         return cls(username=username, password=password, mimo_apikey=mimo_apikey)
 
 
@@ -174,7 +174,7 @@ def _recognize_nine_grid(image_url: str, config: NatfrpConfig) -> list:
     Returns a list of col_row strings, e.g. ["1_1", "3_2"].
     """
     if not config.mimo_apikey:
-        print("  [AI] no NATFRP_MIMO_APIKEY configured", flush=True)
+        print("  [AI] no SAKURAFRP_MIMO_APIKEY configured", flush=True)
         return []
 
     prompt = (
@@ -214,7 +214,7 @@ def _recognize_nine_grid(image_url: str, config: NatfrpConfig) -> list:
 def _recognize_icon(image_url: str, config: NatfrpConfig) -> list:
     """Recognise an icon/space captcha, returning click coordinate strings."""
     if not config.mimo_apikey:
-        print("  [AI] no NATFRP_MIMO_APIKEY configured", flush=True)
+        print("  [AI] no SAKURAFRP_MIMO_APIKEY configured", flush=True)
         return []
 
     prompt = (
@@ -451,7 +451,7 @@ def check_in(config: NatfrpConfig) -> bool:
 
 
 def _notify_if_configured(message: str) -> None:
-    enabled = os.environ.get("NATFRP_NOTIFY", "true").strip().lower() in {
+    enabled = os.environ.get("SAKURAFRP_NOTIFY", "true").strip().lower() in {
         "1", "true", "yes", "on",
     }
     if (

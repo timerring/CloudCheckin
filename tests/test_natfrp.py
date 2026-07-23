@@ -11,7 +11,7 @@ from natfrp.natfrp import (
 
 class ConfigTest(unittest.TestCase):
     def test_reads_cookie_defaults(self):
-        with patch.dict(os.environ, {"NATFRP_COOKIE": "session=abc"}, clear=True):
+        with patch.dict(os.environ, {"SAKURAFRP_COOKIE": "session=abc"}, clear=True):
             config = NatfrpConfig.from_env()
 
         self.assertEqual(config.cookie, "session=abc")
@@ -33,7 +33,7 @@ class NotificationTest(unittest.TestCase):
     @patch("natfrp.natfrp.send_source_notification")
     def test_notifications_can_be_disabled(self, send_notification):
         values = {
-            "NATFRP_NOTIFY": "false",
+            "SAKURAFRP_NOTIFY": "false",
             "TELEGRAM_TOKEN": "token",
             "TELEGRAM_CHAT_ID": "chat",
         }

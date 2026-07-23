@@ -108,10 +108,10 @@ https://github.com/timerring/CloudCheckin/blob/0b719258ab4f5f746b067798eb2a4185a
 <summary>Configure SakuraFrp check-in (pure HTTP + AI captcha recognition)</summary>
 
 1. Register a [SakuraFrp](https://www.natfrp.com/) account and get your login username and password.
-2. Add your username and password to the repository secrets with the names `NATFRP_USERNAME` and `NATFRP_PASSWORD`.
+2. Add your username and password to the repository secrets with the names `SAKURAFRP_USERNAME` and `SAKURAFRP_PASSWORD`.
 3. Get an `api key` from the [MiMo Open Platform](https://platform.xiaomimimo.com/) (SakuraFrp check-in requires a GeeTest 9-grid captcha, so the MiMo vision model is used to recognize it).
    - MiMo `mimo-v2.5` is pay-per-use (¥1/M input tokens + ¥2/M output tokens). Each check-in consumes ~6000 tokens, costing approximately **¥0.01**.
-4. Add the `api key` to the repository secrets with the name `NATFRP_MIMO_APIKEY`.
+4. Add the `api key` to the repository secrets with the name `SAKURAFRP_MIMO_APIKEY`.
 
 > Uses pure HTTP protocol to solve GeeTest v3 (AES-CBC + RSA encryption). No Playwright/browser needed, each check-in takes only 2-3 seconds.
 </details>
