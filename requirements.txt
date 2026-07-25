@@ -2,6 +2,6 @@ requests
 2captcha-python
 curl_cffi
 python-dotenv
-httpx
+httpx[http2]
 cryptography
 openai
