@@ -1,5 +1,38 @@
 version: 2.1
 
+commands:
+  notify-job-failure:
+    parameters:
+      source:
+        type: string
+    steps:
+      - run:
+          name: Notify Telegram about << parameters.source >> failure
+          when: on_fail
+          command: |
+            marker="/tmp/cloudcheckin-telegram-notified"
+            if [ -f "$marker" ]; then
+              echo "A platform notification was already sent; skipping fallback"
+              exit 0
+            fi
+
+            if [ -z "$TELEGRAM_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+              echo "Telegram configuration is incomplete; cannot send failure fallback"
+              exit 0
+            fi
+
+            timestamp=$(TZ=Asia/Shanghai date '+%Y/%m/%d %H:%M:%S')
+            message="${timestamp}
+            << parameters.source >>
+            CircleCI job failed before a platform notification was sent.
+            ${CIRCLE_BUILD_URL}"
+
+            curl --fail --silent --show-error \
+              --request POST \
+              --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+              --data-urlencode "text=${message}" \
+              "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage"
+
 jobs:
   nodeseek:
     docker:
@@ -15,6 +48,8 @@ jobs:
           name: Run Nodeseek signin
           command: |
             python -m nodeseek.nodeseek
+      - notify-job-failure:
+          source: NODESEEK
 
   v2ex:
     docker:
@@ -30,6 +65,8 @@ jobs:
           name: Run V2EX signin
           command: |
             python -m v2ex.v2ex
+      - notify-job-failure:
+          source: V2EX
 
   onepoint3acres:
     docker:
@@ -45,6 +82,8 @@ jobs:
           name: Run 1point3acres signin
           command: |
             python -m onepoint3acres.onepoint3acres
+      - notify-job-failure:
+          source: 1POINT3ACRES
 
   deepflood:
     docker:
@@ -60,6 +99,8 @@ jobs:
           name: Run Deepflood signin
           command: |
             python -m deepflood.deepflood
+      - notify-job-failure:
+          source: DEEPFLOOD
 
   sakurafrp:
     docker:
@@ -75,6 +116,8 @@ jobs:
           name: Run SakuraFrp signin
           command: |
             python -m sakurafrp.sakurafrp
+      - notify-job-failure:
+          source: SAKURAFRP
 
 workflows:
   # Allow manual triggers
