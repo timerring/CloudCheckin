@@ -15,6 +15,7 @@ TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN', '').strip()
 TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '').strip()
 
 BEIJING_TIMEZONE = timezone(timedelta(hours=8))
+NOTIFICATION_SENT_MARKER = "/tmp/cloudcheckin-telegram-notified"
 
 
 def format_source_notification(source, messages, now=None):
@@ -75,6 +76,14 @@ def send_tg_notification(message):
         # handle response
         if response.status == 200 and result.get('ok'):
             print("Notification sent successfully", flush=True)
+            try:
+                with open(NOTIFICATION_SENT_MARKER, "a", encoding="utf-8"):
+                    pass
+            except OSError as marker_error:
+                print(
+                    f"Could not record notification delivery: {marker_error}",
+                    flush=True,
+                )
         else:
             print(f"Notification sent failed: {response.status} - {data}", flush=True)
             raise Exception(f"Notification sent failed: {response.status} - {data}")
