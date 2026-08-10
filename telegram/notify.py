@@ -1,7 +1,9 @@
 import http.client
+import html
 import urllib.parse
 import json
 import os
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
@@ -16,6 +18,29 @@ TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '').strip()
 
 BEIJING_TIMEZONE = timezone(timedelta(hours=8))
 NOTIFICATION_SENT_MARKER = "/tmp/cloudcheckin-telegram-notified"
+TELEGRAM_MESSAGE_LIMIT = 4000
+TRUNCATION_SUFFIX = "\n... [message truncated]"
+HTTP_ERROR_DETAIL_LIMIT = 240
+
+
+def summarize_http_failure(status_code, response_text):
+    """Return a compact, notification-safe summary of an HTTP failure."""
+    text = str(response_text or "").strip()
+    title_match = re.search(r"<title[^>]*>(.*?)</title>", text, re.IGNORECASE | re.DOTALL)
+
+    if title_match:
+        detail = html.unescape(title_match.group(1))
+        detail = re.sub(r"\s+", " ", detail).strip()
+    elif text.startswith("<"):
+        detail = "HTML error response"
+    else:
+        detail = re.sub(r"\s+", " ", text).strip()
+
+    if len(detail) > HTTP_ERROR_DETAIL_LIMIT:
+        detail = detail[:HTTP_ERROR_DETAIL_LIMIT - 3].rstrip() + "..."
+
+    summary = f"HTTP {status_code}"
+    return f"{summary}: {detail}" if detail else summary
 
 
 def format_source_notification(source, messages, now=None):
@@ -32,7 +57,15 @@ def format_source_notification(source, messages, now=None):
         body = "No result was reported."
 
     timestamp = now or datetime.now(BEIJING_TIMEZONE)
-    return f"{timestamp.strftime('%Y/%m/%d %H:%M:%S')}\n{source.upper()}\n{body}"
+    notification = (
+        f"{timestamp.strftime('%Y/%m/%d %H:%M:%S')}\n{source.upper()}\n{body}"
+    )
+    if len(notification) > TELEGRAM_MESSAGE_LIMIT:
+        notification = (
+            notification[:TELEGRAM_MESSAGE_LIMIT - len(TRUNCATION_SUFFIX)]
+            + TRUNCATION_SUFFIX
+        )
+    return notification
 
 
 def send_source_notification(source, messages):
