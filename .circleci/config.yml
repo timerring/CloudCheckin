@@ -16,7 +16,9 @@ commands:
               exit 0
             fi
 
-            if [ -z "$TELEGRAM_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            telegram_token=$(printf '%s' "$TELEGRAM_TOKEN" | tr -d '\r\n')
+            telegram_chat_id=$(printf '%s' "$TELEGRAM_CHAT_ID" | tr -d '\r\n')
+            if [ -z "$telegram_token" ] || [ -z "$telegram_chat_id" ]; then
               echo "Telegram configuration is incomplete; cannot send failure fallback"
               exit 0
             fi
@@ -29,9 +31,9 @@ commands:
 
             curl --fail --silent --show-error \
               --request POST \
-              --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+              --data-urlencode "chat_id=${telegram_chat_id}" \
               --data-urlencode "text=${message}" \
-              "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage"
+              "https://api.telegram.org/bot${telegram_token}/sendMessage"
 
 jobs:
   nodeseek:

@@ -3,7 +3,7 @@ from curl_cffi import requests
 import random
 import time
 from dotenv import load_dotenv
-from telegram.notify import send_source_notification
+from telegram.notify import send_source_notification, summarize_http_failure
 
 load_dotenv()
 
@@ -48,7 +48,8 @@ def main():
             if response.status_code == 200:
                 result = f"Account {account}: check-in successful"
             else:
-                result = f"Account {account}: check-in failed — {response.text}"
+                failure = summarize_http_failure(response.status_code, response.text)
+                result = f"Account {account}: check-in failed — {failure}"
                 failed = True
         except Exception as exc:
             result = f"Account {account}: check-in error — {exc}"
