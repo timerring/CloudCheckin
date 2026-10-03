@@ -82,7 +82,9 @@ def balance() -> tuple[str, str]:
     res = requests.get(url, headers=headers, impersonate=IMPERSONATE)
     content = res.text
     # print(content)
-    pattern = r'每日登录奖励.*?<small class="gray">(.*?)</small>.*?<td class="d" style="text-align: right;">.*?</td>.*?<td class="d" style="text-align: right;">(.*?)</td>'
+    # A row is: time, type, amount, balance; anchor on the type cell so the time
+    # comes from the same row rather than the next one.
+    pattern = r'<small class="gray">([^<]*)</small></td>\s*<td class="d">每日登录奖励</td>\s*<td class="d" style="text-align: right;">.*?</td>\s*<td class="d" style="text-align: right;">(.*?)</td>'
     match = re.search(pattern, content, re.DOTALL)
     
     if match:
