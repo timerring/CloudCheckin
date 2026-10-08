@@ -9,21 +9,12 @@ load_dotenv()
 
 cookie = os.environ.get('V2EX_COOKIE', '').strip()
 message = ""
+# Let curl_cffi supply a consistent browser fingerprint and headers: hand-written
+# sec-ch-ua/user-agent values that disagree with the TLS fingerprint get a
+# Cloudflare challenge (403) on /mission/daily.
+IMPERSONATE = "chrome"
 headers = {
-    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-    "accept-language": "en-US,en;q=0.9",
-    "cache-control": "no-cache",
-    "pragma": "no-cache",
     "referer": "https://www.v2ex.com/mission/daily",
-    "sec-ch-ua": '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
-    "sec-ch-ua-mobile": "?0",
-    "sec-ch-ua-platform": '"macOS"',
-    "sec-fetch-dest": "document",
-    "sec-fetch-mode": "navigate",
-    "sec-fetch-site": "same-origin",
-    "sec-fetch-user": "?1",
-    "upgrade-insecure-requests": "1",
-    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
     "cookie": cookie,
 }
 
@@ -35,7 +26,7 @@ def get_once() -> tuple[str, bool]:
     """
     global message
     url = "https://www.v2ex.com/mission/daily"
-    res = requests.get(url, headers=headers)
+    res = requests.get(url, headers=headers, impersonate=IMPERSONATE)
     content = res.text
     
     reg1 = r"需要先登录"
@@ -69,7 +60,7 @@ def check_in(once: str) -> bool:
     """
     global message
     url = f"https://www.v2ex.com/mission/daily/redeem?once={once}"
-    res = requests.get(url, headers=headers)
+    res = requests.get(url, headers=headers, impersonate=IMPERSONATE)
     content = res.text
     
     reg = r"已成功领取每日登录奖励"
@@ -88,10 +79,12 @@ def balance() -> tuple[str, str]:
         tuple: the time and balance
     """
     url = "https://www.v2ex.com/balance"
-    res = requests.get(url, headers=headers)
+    res = requests.get(url, headers=headers, impersonate=IMPERSONATE)
     content = res.text
     # print(content)
-    pattern = r'每日登录奖励.*?<small class="gray">(.*?)</small>.*?<td class="d" style="text-align: right;">.*?</td>.*?<td class="d" style="text-align: right;">(.*?)</td>'
+    # A row is: time, type, amount, balance; anchor on the type cell so the time
+    # comes from the same row rather than the next one.
+    pattern = r'<small class="gray">([^<]*)</small></td>\s*<td class="d">每日登录奖励</td>\s*<td class="d" style="text-align: right;">.*?</td>\s*<td class="d" style="text-align: right;">(.*?)</td>'
     match = re.search(pattern, content, re.DOTALL)
     
     if match:
