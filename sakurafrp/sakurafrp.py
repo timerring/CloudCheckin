@@ -134,7 +134,7 @@ def _download_image(url: str) -> bytes:
 
 
 def _call_mimo(image_url: str, prompt: str, config: NatfrpConfig,
-               model: str = "mimo-v2.5") -> str:
+               model: str = "mimo-v2.6-flash") -> str:
     """Download a captcha image and send it to MiMo for recognition."""
     img_bytes = _download_image(image_url)
     b64 = base64.b64encode(img_bytes).decode("utf-8")
