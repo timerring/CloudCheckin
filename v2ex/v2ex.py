@@ -15,8 +15,15 @@ message = ""
 IMPERSONATE = "chrome"
 headers = {
     "referer": "https://www.v2ex.com/mission/daily",
-    "cookie": cookie,
 }
+# V2EX stores the redeem `once` token in a PB3_SESSION it re-issues on each page
+# load, so the redeem request must carry the cookies set by /mission/daily; a
+# fixed cookie header sends the stale session and the redeem silently fails.
+session = requests.Session(impersonate=IMPERSONATE)
+for part in cookie.split(";"):
+    if "=" in part:
+        name, value = part.strip().split("=", 1)
+        session.cookies.set(name, value, domain="www.v2ex.com")
 
 def get_once() -> tuple[str, bool]:
     """get the once number and whether signed
@@ -26,7 +33,7 @@ def get_once() -> tuple[str, bool]:
     """
     global message
     url = "https://www.v2ex.com/mission/daily"
-    res = requests.get(url, headers=headers, impersonate=IMPERSONATE)
+    res = session.get(url, headers=headers)
     content = res.text
     
     reg1 = r"需要先登录"
@@ -60,7 +67,7 @@ def check_in(once: str) -> bool:
     """
     global message
     url = f"https://www.v2ex.com/mission/daily/redeem?once={once}"
-    res = requests.get(url, headers=headers, impersonate=IMPERSONATE)
+    res = session.get(url, headers=headers)
     content = res.text
     
     reg = r"已成功领取每日登录奖励"
@@ -79,7 +86,7 @@ def balance() -> tuple[str, str]:
         tuple: the time and balance
     """
     url = "https://www.v2ex.com/balance"
-    res = requests.get(url, headers=headers, impersonate=IMPERSONATE)
+    res = session.get(url, headers=headers)
     content = res.text
     # print(content)
     # A row is: time, type, amount, balance; anchor on the type cell so the time
